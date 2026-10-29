@@ -1,0 +1,5 @@
+timestamp,id,field,old,new,note
+20261001_101500_000001,VAC-002,status,ACTIVE,APPLIED,synthetic
+20261008_093000_000002,VAC-003,status,APPLIED,NO_RESPONSE,synthetic
+20261015_140000_000003,VAC-004,status,APPLIED,REJECTED,synthetic
+20261020_110000_000004,VAC-040,ROW,,Northwind Labs / Platform Engineer / ACTIVE,synthetic

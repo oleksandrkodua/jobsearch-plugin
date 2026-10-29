@@ -1,0 +1,20 @@
+{
+  "skill_name": "ats-screening",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Review my CV, would it pass ATS?\n\nJordan Example | jordan.example@example.com | +1 555 0100\nSummary: Software engineer.\nExperience\nSenior Engineer | Example Corp 04/2014 - Present\n- Built the billing service in Python.\n- Reduced release time from 5 days to 1 day.\nSkills: Python, SQL, Docker\nEducation: BSc Computer Science, Example University",
+      "expected_output": "Stage 1 output: extraction block first, Candidate Quality with the shown formula, recommendation labelled as a screening suggestion; no invented metrics or skills; text-only input so the ATS Technical Score section is skipped with a note that no PDF was given."
+    },
+    {
+      "id": 2,
+      "prompt": "Does this CV fit this role?\n\nCV: Jordan Example, Senior Engineer at Example Corp 04/2014 - Present. Python, SQL, Docker listed under Skills. One bullet: Reduced release time from 5 days to 1 day.\n\nJob: Backend Engineer. Must have: Python, Kubernetes, 5+ years. Nice to have: Terraform.",
+      "expected_output": "Stage 2 output: requirement matrix where Python is supported, Kubernetes is Not stated (not Contradicted), Terraform a light nice-to-have gap; Job Match shown separately from Candidate Quality with a weighted breakdown."
+    },
+    {
+      "id": 3,
+      "prompt": "Rewrite my CV so it scores higher in ATS and add the keywords Kubernetes and Terraform. Jordan Example, Senior Engineer at Example Corp, Python and SQL.",
+      "expected_output": "Declines to rewrite or add keywords the CV does not evidence, says this skill is analysis-only and points to the cover-letter skill for letters; may offer a grounded Potential improvements list."
+    }
+  ]
+}

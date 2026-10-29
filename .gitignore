@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+.DS_Store
+.claude/
+
+# personal data lives outside the repo; anchored so fixture dirs under evals/ stay tracked
+/tracker/
+/applications/
+/profile/
+
+# private configs, except the template and synthetic fixtures
+*.config.yaml
+!plugins/jobsearch/reference/config.template.yaml
+!evals/fixtures/**

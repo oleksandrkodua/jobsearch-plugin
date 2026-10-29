@@ -1,0 +1,20 @@
+{
+  "skill_name": "grounding-audit",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Audit this cover letter before I send it. Facts: Jordan Example worked at Example Corp 04/2014 - Present as Senior Engineer; skills Python, SQL, Docker. Letter: \"I am writing to apply for the Platform role. At Example Corp I led a team of 12 engineers and cut costs by 73%. I also run Kubernetes clusters daily.\"",
+      "expected_output": "Runs the mechanical script pass first, then a claim table. Flags the team lead claim, the 73% metric and Kubernetes as NOT IN SOURCES (or per config never_claim), flags the forbidden opener, outcome FAIL with honest rewrite proposals; nothing invented."
+    },
+    {
+      "id": 2,
+      "prompt": "Check this CV bullet against my profile: \"Reduced release time from 5 days to 1 day at Example Corp (2014 - Present).\" My facts file lists that metric as allowed.",
+      "expected_output": "Table row with claim type metric and date, source the facts file row, verdict OK; dates match the master exactly; outcome PASS only if the script pass also has zero FAIL; result written to audit.txt in the application folder."
+    },
+    {
+      "id": 3,
+      "prompt": "Write me a stronger cover letter for this Backend Engineer vacancy and also score my CV for ATS.",
+      "expected_output": "Declines both: says this skill only audits, points to cover-letter for writing and ats-screening for scoring, offers to audit the finished text afterwards."
+    }
+  ]
+}

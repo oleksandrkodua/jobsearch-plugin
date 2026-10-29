@@ -1,0 +1,13 @@
+{
+  "name": "jobsearch-marketplace",
+  "owner": {
+    "name": "jobsearch maintainers"
+  },
+  "plugins": [
+    {
+      "name": "jobsearch",
+      "source": "./plugins/jobsearch",
+      "description": "Job-search engine: triage, honest letters, grounding audit, tracker; personal data stays in your data dir"
+    }
+  ]
+}

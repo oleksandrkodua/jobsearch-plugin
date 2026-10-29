@@ -1,0 +1,116 @@
+# QA example preset for jobsearch. An EXAMPLE, not a default: copy it to your data folder as
+# jobsearch.config.yaml, then fill in identity, paths and targets yourself.
+# Check your copy: run /jobsearch:jobsearch-setup, or the plugin's scripts/datadir.py with: validate PATH
+# Every personal value below is intentionally empty.
+
+identity:
+  full_name: ""
+  short_name: ""
+  emails: []
+  phones: []
+  handles: []
+  extra_private_terms: []
+
+language: {chat: "", files: "en"}
+
+paths:
+  facts: profile/facts.md
+  master_cv: profile/master_cv/MASTER_CONTENT.md
+  cv_files: []
+  letter_kb: cover_letters/
+  tracker: tracker/vacancies.csv
+  applications: applications/
+  ranked: vacancies/ranked/
+  story_bank: interview/story_bank.md
+  reports: reports/
+  start_file: START_HERE.md
+  todo_file: TODO.md
+  study_library: []
+
+tracker: {id_prefix: "VAC-", decided_by_label: "DECIDED_BY_USER", statuses: default}
+
+targets: {roles: [], roles_selective: [], roles_not_primary: [], domains_priority: [], formats: []}
+
+# EXAMPLE blockers for a manual QA search. Edit, delete or add your own.
+# Keyword blockers are soft (flag and ask), except where you decide a hard stop is right for you.
+blockers:
+  - {type: keyword, any: ["SDET", "coding challenge", "live coding", "take-home coding"], severity: soft, label: "SDET role or coding challenge (example)"}
+  - {type: keyword, any: ["own the automation framework", "build the automation framework", "framework ownership", "design the test framework"], severity: soft, label: "automation framework ownership (example)"}
+  - {type: keyword, any: ["Kafka", "RabbitMQ", "ActiveMQ"], severity: soft, label: "specific message brokers named as required (example)"}
+  - {type: keyword, any: ["Junior", "Trainee", "Intern"], severity: soft, label: "explicit lower-level label (example)"}
+  - {type: keyword, any: ["Hubstaff", "Time Doctor", "ActivTrak", "screenshot monitoring", "activity tracker"], severity: hard, label: "activity trackers (example)"}
+  # Example domain list: domains you want flagged for a decision. Replace with your own.
+  - {type: domain, any: ["gambling", "casino", "adult content", "crypto exchange"], severity: soft, label: "domain to avoid (example)"}
+
+match_weights: {must_have: 60, nice_to_have: 10, seniority: 10, domain: 10, format_salary: 10}
+thresholds: {apply: 80, decline: 65}
+
+portals:
+  job_portals: []
+  employer_ats: [greenhouse, lever, workable, ashby, recruitee, personio, teamtailor, smartrecruiters, breezy]
+  confirmed_domains: []
+
+honesty:
+  never_claim: []
+  allowed_exceptions: []
+  # A manual QA candidate should not claim to write automation code. The pattern lists automation tools and
+  # languages; a sentence that names one is allowed in a letter only together with a disclaimer word
+  # (disclaimer_pattern), and never on the CV (cv_forbidden: true). Adjust to what is true for you.
+  restricted_tools:
+    pattern: "Selenium|Playwright|Appium|Cypress|TypeScript|Espresso|XCUITest|Python|JavaScript"
+    disclaimer_pattern: "don't write|do not write|not an automation|myself|won't pretend|PoC|proof of concept|case study|generated code|not evidence|without writing"
+    cv_forbidden: true
+  # Tools to WARN on if absent from your master skills (common QA tooling).
+  tool_dictionary:
+    - Selenium
+    - Playwright
+    - Appium
+    - Cypress
+    - JMeter
+    - k6
+    - Jenkins
+    - Docker
+    - Kubernetes
+    - Confluence
+    - Git
+    - GitHub
+    - Qase
+    - Zephyr
+    - xRay
+    - Charles
+    - Wireshark
+    - Redis
+    - ActiveMQ
+    - Kafka
+    - Swagger
+    - SoapUI
+    - BrowserStack
+    - Cucumber
+    - Allure
+    - Azure DevOps
+    - ClickUp
+    - Trello
+    - Figma
+  allowed_numbers: []
+  allowed_year_claims: []
+  known_risk_lines: []
+
+letters:
+  words_min: 150
+  words_max: 320
+  salutation: ""
+  forbidden_openers: []
+  forbidden_buzzwords: []
+  no_long_dash: true
+  signature_lines: []
+  # Neutral archetype keys: one base letter per kind of vacancy. Write the texts in paths.letter_kb.
+  base_letters: [general, web_product, mobile, api_backend, ecommerce, regulated_domain]
+
+followup: {default_days: 10, window_days: [3, 7], max_followups: 2}
+
+interview: {redflag_checks: []}
+
+alt_flow:
+  scanner: {enabled: false}
+  apply_assistant: {enabled: false}
+  reply_watch: {enabled: false}

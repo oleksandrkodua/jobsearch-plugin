@@ -1,0 +1,20 @@
+{
+  "skill_name": "humanizer",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Humanize this paragraph: \"Our platform serves as a testament to innovation, boasting a vibrant, groundbreaking suite of features that underscore its pivotal role in the evolving landscape.\"",
+      "expected_output": "Identifies inflated symbolism, promotional language and AI vocabulary, gives a draft, a short self-check of what still sounds like AI, and a plainer final rewrite with no new facts."
+    },
+    {
+      "id": 2,
+      "prompt": "Make this letter sound less like AI, but keep every fact and number exactly as written: \"I am excited to leverage my 8 years at Example Corp \\u2014 a journey of growth \\u2014 to contribute.\"",
+      "expected_output": "Removes the em dashes and filler, keeps 8 years and Example Corp unchanged, adds no new claim."
+    },
+    {
+      "id": 3,
+      "prompt": "Is every claim in this CV true? Check it against my facts file.",
+      "expected_output": "Declines the fact check, says this skill only edits style and points to grounding-audit for verification."
+    }
+  ]
+}

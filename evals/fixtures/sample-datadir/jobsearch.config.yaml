@@ -1,0 +1,42 @@
+# Synthetic fixture config (persona is fictional).
+identity:
+  full_name: "Jordan Example"
+  short_name: "Jordan"
+  emails: ["jordan.example@example.com"]
+  phones: ["+1 555 0100"]
+  handles: ["@jordan_example"]
+  extra_private_terms: ["Example Corp"]
+language: {chat: "en", files: "en"}
+targets:
+  roles: ["Senior Engineer"]
+  domains_priority: [fintech, logistics]
+portals:
+  job_portals: [linkedin.com]
+  confirmed_domains: [example.org]
+thresholds: {apply: 75}
+honesty:
+  never_claim:
+    - pattern: '\bblockchain\b'
+      why: "blockchain: not Jordan's experience"
+    - pattern: 'team lead|managed (a )?team'
+      why: "people management is not claimable"
+  allowed_exceptions:
+    - pattern: 'degree in blockchain'
+      why: "education line is factual"
+  restricted_tools:
+    pattern: 'Selenium|Cypress'
+    disclaimer_pattern: 'side project|do not write|prototype'
+    cv_forbidden: true
+  tool_dictionary: [Python, Docker, Kubernetes, Terraform]
+  allowed_numbers: ["40%"]
+  allowed_year_claims:
+    - {n: 8, note: "8 total"}
+    - {n: 3, note: "3 on the platform team"}
+letters:
+  words_min: 150
+  words_max: 320
+  salutation: "Dear Hiring Team"
+  forbidden_openers: ['I am writing to apply']
+  forbidden_buzzwords: ['passionate', 'synergies']
+  no_long_dash: true
+  signature_lines: ['Best regards,?', 'Jordan Example']

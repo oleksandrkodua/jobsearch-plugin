@@ -1,0 +1,84 @@
+# jobsearch config template. Copy to your data folder as jobsearch.config.yaml and fill in.
+# Personal values stay in YOUR copy, never in the plugin repo. Empty = not configured.
+# Check your copy: run /jobsearch:jobsearch-setup, or the plugin's scripts/datadir.py with: validate PATH
+
+identity:               # used by letters and the publish gate; never printed in reports
+  full_name: ""
+  short_name: ""
+  emails: []
+  phones: []            # every known variant, including old ones
+  handles: []           # messenger handles etc.
+  extra_private_terms: []   # employer names, project names, anything the gate must not find
+
+language: {chat: "", files: "en"}
+
+paths:                  # relative to the data folder
+  facts: profile/facts.md
+  master_cv: profile/master_cv/MASTER_CONTENT.md
+  cv_files: []          # read-only final CV files
+  letter_kb: cover_letters/
+  tracker: tracker/vacancies.csv
+  applications: applications/
+  ranked: vacancies/ranked/
+  story_bank: interview/story_bank.md
+  reports: reports/
+  start_file: START_HERE.md
+  todo_file: TODO.md
+  study_library: []     # read-only folders for /upskill and /interview
+
+tracker: {id_prefix: "VAC-", decided_by_label: "DECIDED_BY_USER", statuses: default}
+
+targets: {roles: [], roles_selective: [], roles_not_primary: [], domains_priority: [], formats: []}
+
+# Typed blockers; severity hard|soft (soft = flag and ask, never auto-reject). Example items:
+#   - {type: salary_min_net, value: 0, currency: USD, severity: hard}
+#   - {type: workday_end_after, value: "20:00", tz: "", severity: hard}
+#   - {type: keyword, any: [], severity: hard, label: ""}
+#   - {type: domain, any: [], severity: soft, label: ""}
+blockers: []
+
+match_weights: {must_have: 60, nice_to_have: 10, seniority: 10, domain: 10, format_salary: 10}
+thresholds: {apply: 80, decline: 65}
+
+portals:
+  job_portals: []
+  employer_ats: [greenhouse, lever, workable, ashby, recruitee, personio, teamtailor, smartrecruiters, breezy]
+  confirmed_domains: []
+
+honesty:
+  never_claim: []           # items: {pattern: "regex", why: ""}; a match FAILs the grounding audit
+  allowed_exceptions: []    # items: {pattern: "regex", why: "", rules: [..]}; sentence-level exceptions.
+                            # optional rules: each item is a never_claim pattern, a substring of its "why", or the fixed reason
+                            # "forbidden opener" / "forbidden buzzword"; must be a non-empty list. The exception then
+                            # suppresses only those rules. Absent rules = the exception applies to every rule
+  restricted_tools: {pattern: "", disclaimer_pattern: "", cv_forbidden: true}
+  tool_dictionary: []       # tools to WARN on if absent from master skills
+  allowed_numbers: []       # the only metrics allowed
+  allowed_year_claims: []   # items: {n: 10, scope: "total"}
+  known_risk_lines: []      # lines in the final CV you disown; warned once per application
+
+letters:
+  words_min: 150
+  words_max: 320
+  salutation: ""
+  forbidden_openers: []
+  forbidden_buzzwords: []
+  no_long_dash: true
+  signature_lines: []
+  base_letters: []
+
+followup: {default_days: 10, window_days: [3, 7], max_followups: 2}
+
+interview: {redflag_checks: []}
+
+alt_flow:               # all off by default
+  scanner: {enabled: false}
+  apply_assistant: {enabled: false}
+  reply_watch: {enabled: false}
+
+publish_gate:           # only for maintainers who publish a repo with the plugin's publish gate
+  # Per-file exceptions. A hit is skipped ONLY when it sits in the file `path` (repo-relative, exact) AND the
+  # matched text is inside `value` (case-insensitive), e.g. your own name in a LICENSE copyright line:
+  #   - {path: "LICENSE", value: "Copyright (c) <year> <your name>"}
+  # Hits in other files, commit authors and messages, ref names and file names still fail.
+  allow: []

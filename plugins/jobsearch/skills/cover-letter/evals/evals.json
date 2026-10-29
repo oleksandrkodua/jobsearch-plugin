@@ -1,0 +1,20 @@
+{
+  "skill_name": "cover-letter",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Write a cover letter for this vacancy. Jordan Example, Senior Engineer at Example Corp, Python and SQL. Vacancy: Backend Engineer at Sample Ltd, must have Python, Kubernetes, 5+ years; nice to have Terraform.",
+      "expected_output": "Picks a base letter from letters.base_letters (or says none configured), matches strengths and lists Kubernetes and Terraform as gaps to admit honestly or omit; no invented tools; length within letters.words_min and words_max; runs humanizer and grounding-audit; says not sent."
+    },
+    {
+      "id": 2,
+      "prompt": "I only have the link to the vacancy, no text. Please write the letter anyway.",
+      "expected_output": "Asks for the full vacancy text and does not guess requirements from the link or title."
+    },
+    {
+      "id": 3,
+      "prompt": "The company replied that I am rejected. Mark it in my tracker.",
+      "expected_output": "Declines to edit the tracker in this skill and points to the /outcome command (which uses tracker_edit.py); may offer to draft a polite reply, not sent."
+    }
+  ]
+}
