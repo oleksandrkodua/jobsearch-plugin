@@ -153,6 +153,15 @@ class FunnelCase(unittest.TestCase):
         for n in ("got a reply", "recruiter replied", "response received"):
             self.assertTrue(funnel_report.is_reply_note(n), n)
 
+    def test_negation_further_before_reply_word_and_auto_reply(self):
+        for n in ("did not get a reply", "didn't receive any response", "never got a reply", "no reply yet",
+                  "still no response", "not replied", "Did not get a reply from them", "auto-reply received",
+                  "got an automatic reply", "Auto-Reply only"):
+            self.assertFalse(funnel_report.is_reply_note(n), n)
+        for n in ("got a reply", "they replied", "response received", "recruiter responded",
+                  "no luck on phone, but they replied by mail", "No news. Recruiter replied today"):
+            self.assertTrue(funnel_report.is_reply_note(n), n)
+
     def test_any_reply_counts_only_applied_rows(self):
         rows = [mk(1, "DECLINED", applied=""), mk(2, "APPLIED")]
         log = [{"timestamp": "20261005_100000_000001", "id": "VAC-001", "field": "note", "old": "", "new": "",
@@ -219,6 +228,33 @@ class FunnelCase(unittest.TestCase):
                 self.assertIn("refusing", out)
         self.assertEqual({p: read_bytes(p) for p in before}, before)
         self.assertFalse(os.path.exists(os.path.join(tdir, "history")))
+
+    def _fs_case_insensitive(self):
+        return os.path.exists(self.dd.swapcase()) and os.path.samefile(self.dd, self.dd.swapcase())
+
+    def test_out_case_variant_is_refused(self):
+        if not self._fs_case_insensitive():
+            self.skipTest("test filesystem is case-sensitive: case variants are different paths")
+        tdir = os.path.join(self.dd, "tracker")
+        for target in (os.path.join(self.dd, "TRACKER", "changelog.csv"),
+                       os.path.join(self.dd, "Tracker", "HISTORY", "r.md"),
+                       os.path.join(self.dd, "tracker", "VACANCIES.CSV")):
+            with self.subTest(target=target):
+                rc, out = self.run_main("--out", target)
+                self.assertEqual(rc, 1, out)
+                self.assertIn("refusing", out)
+        self.assertFalse(os.path.exists(os.path.join(tdir, "history")))
+
+    def test_symlinked_tracker_real_folder_is_protected(self):
+        real = os.path.join(os.path.dirname(self.dd), "real_tracker")
+        os.rename(os.path.join(self.dd, "tracker"), real)
+        os.symlink(real, os.path.join(self.dd, "tracker"))
+        for target in (os.path.join(real, "history", "r.md"), os.path.join(real, "CHANGELOG.csv"),
+                       os.path.join(self.dd, "tracker", "history", "r.md")):
+            with self.subTest(target=target):
+                rc, out = self.run_main("--out", target)
+                self.assertEqual(rc, 1, out)
+        self.assertFalse(os.path.exists(os.path.join(real, "history")))
 
     def test_root_level_tracker_layout_writes_default_report(self):
         # paths.tracker at the data-folder root: the folder holding the tracker IS the data dir

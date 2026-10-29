@@ -6,7 +6,8 @@
 Stages: evaluated (all rows) -> applied -> any reply -> active / rejected. Reply rate by host class (job portal /
 employer ATS / other) and by role type, rejection reasons by gap:<tag> tokens in the notes columns, median days
 from applied_date to the first reply (a CHANGELOG change to REJECTED/ACTIVE or a reply note, on/after applied_date).
-A reply note mentions a reply or response not preceded by no / not / awaiting / waiting for. A group with fewer
+A reply note mentions a reply or response with no negation (no / not / never / n't / without / awaiting /
+waiting) up to 4 words before it in the same clause; an auto-reply is not a reply. A group with fewer
 than 5 applications is marked "too few to conclude". Writes <paths.reports>/funnel_<date>.md (creates only that
 folder) and prints it. Never overwrites: an existing report gets a _2, _3 ... suffix. Refuses any --out equal to the
 tracker or CHANGELOG.csv, or inside the tracker's history/ folder (exit 1).
@@ -21,7 +22,9 @@ MIN_N = 5
 APPLIED_STATUSES = {"APPLIED", "NO_RESPONSE", "REJECTED", "ACTIVE"}
 REPLY_STATUSES = {"REJECTED", "ACTIVE"}
 REPLY_RE = re.compile(r"\b(repl(y|ied|ies)|respon(se|ded))\b", re.I)
-NEGATION_RE = re.compile(r"(\b(no|not|never|without|awaiting|waiting\s+for)|n't)\s+((a|an|any|the|their|yet)\s+)?$", re.I)
+NEGATIONS = {"no", "not", "never", "without", "awaiting", "waiting"}
+NEG_WINDOW = 4  # a negation this many words (or fewer) before the reply word, in the same clause
+AUTO_REPLY_RE = re.compile(r"\b(auto|automatic|automated)[\s-]*repl(y|ies)\b", re.I)
 GAP_RE = re.compile(r"\bgap:([\w.+#-]+)", re.I)
 TOO_FEW = "too few to conclude"
 
@@ -69,9 +72,14 @@ def _is_applied(r):
 
 
 def is_reply_note(note):
-    """A note reports a reply when a reply word is not preceded by no / not / awaiting / waiting for."""
-    note = note or ""
-    return any(not NEGATION_RE.search(note[:m.start()]) for m in REPLY_RE.finditer(note))
+    """A note reports a reply when a reply word has no negation within NEG_WINDOW words before it in its clause."""
+    note = AUTO_REPLY_RE.sub(" ", note or "")
+    for m in REPLY_RE.finditer(note):
+        clause = re.split(r"[.,;:!?()\n]", note[:m.start()])[-1]
+        words = re.findall(r"[\w'\u2019]+", clause.lower())[-NEG_WINDOW:]
+        if not any(w in NEGATIONS or w.endswith(("n't", "n\u2019t")) for w in words):
+            return True
+    return False
 
 
 def _is_reply_change(c):
@@ -172,8 +180,22 @@ def _read(path):
         return list(csv.DictReader(f))
 
 
-def _inside(path, folder):
-    path, folder = os.path.realpath(path), os.path.realpath(folder)
+def _fs_case_insensitive(folder):
+    """True when `folder` with its letter case swapped is the same directory (macOS / Windows default)."""
+    swapped = folder.swapcase()
+    try:
+        return swapped != folder and os.path.samefile(folder, swapped)
+    except OSError:
+        return False
+
+
+def _key(path, fold):
+    p = os.path.normcase(os.path.realpath(path))
+    return p.casefold() if fold else p
+
+
+def _inside(path, folder, fold=False):
+    path, folder = _key(path, fold), _key(folder, fold)
     return path == folder or path.startswith(folder.rstrip(os.sep) + os.sep)
 
 
@@ -213,7 +235,12 @@ def main(argv, env=None, cwd=None):
     changelog_path = os.path.join(tracker_dir, "CHANGELOG.csv")
     out = a.out or os.path.join(datadir.data_path(cfg, dd, "reports"), f"funnel_{today.isoformat()}.md")
     # off-limits: the tracker, its CHANGELOG and the history/ backup folder (the tracker may sit at the data-dir root)
-    if any(_inside(out, p) for p in (tracker, changelog_path, os.path.join(tracker_dir, "history"))):
+    # realpath resolves a symlinked tracker to its real folder; case-fold when the filesystem ignores case
+    fold = _fs_case_insensitive(os.path.dirname(os.path.realpath(tracker)))
+    real_dir = os.path.dirname(os.path.realpath(tracker))
+    guarded = {tracker, changelog_path, os.path.join(tracker_dir, "history"),
+               os.path.realpath(tracker), os.path.join(real_dir, "CHANGELOG.csv"), os.path.join(real_dir, "history")}
+    if any(_inside(out, p, fold) for p in guarded):
         print(f"error: refusing to write the report over the tracker, its CHANGELOG or into its history/ folder "
               f"({tracker_dir}); choose another --out")
         return 1

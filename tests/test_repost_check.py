@@ -96,7 +96,7 @@ class RepostCase(unittest.TestCase):
         with open(os.path.join(self.ranked, name), "w", encoding="utf-8") as f:
             f.write(f"Vacancy Check\nCompany: {company}\nTitle: Something Else\nDate: 2026-10-01\n"
                     f"Match: {verdict}%  (arithmetic with many words {verdict} {verdict} {verdict})\n"
-                    f"Decision: APPLY - reason number {verdict}\n\n## Description\n{desc}\n\n## Notes\nother {verdict}\n")
+                    f"Decision: APPLY - reason number {verdict}\n\n## Notes\nother {verdict}\n\n## Description\n{desc}\n")
 
     def test_ranked_description_section_fingerprint(self):
         desc = "Build reliable pipelines with Python and Kafka for payments data teams across Europe"
@@ -111,6 +111,25 @@ class RepostCase(unittest.TestCase):
         self._ranked("r2.md", "Other Corp", desc, 88)
         self.assertEqual(sorted(h["id_or_file"] for h in self.find([], body=desc)), ["r1.md", "r2.md"])
         self.assertEqual(self.find([], body="a completely different vacancy text about nursing shifts"), [])
+
+    def _write(self, name, text):
+        with open(os.path.join(self.ranked, name), "w", encoding="utf-8", newline="") as f:
+            f.write(text)
+
+    def test_description_with_inner_heading_is_fully_fingerprinted(self):
+        full = ("Build reliable pipelines with Python and Kafka.\n\n## Requirements\nFive years of Go and SQL "
+                "experience for payments data teams across Europe\n")
+        self._write("h.md", "Company: Renamed Corp\nTitle: Other\nDate: 2026-10-01\n\n## Notes\nx\n\n## Description\n" + full)
+        hits = self.find([], body=full)
+        self.assertEqual([h["id_or_file"] for h in hits], ["h.md"])
+        self.assertIn("description", hits[0]["reason"])
+
+    def test_description_crlf_and_no_space_heading(self):
+        full = "Build reliable pipelines with Python and Kafka.\n\n## Requirements\nGo and SQL for payments data\n"
+        self._write("c.md", ("Company: A\nTitle: B\nDate: 2026-10-01\n\n## Description\n" + full).replace("\n", "\r\n"))
+        self._write("n.md", "Company: C\nTitle: D\nDate: 2026-10-01\n\n##Description\n" + full)
+        self._write("u.md", "Company: E\nTitle: F\nDate: 2026-10-01\n\n## DESCRIPTION  \n" + full)
+        self.assertEqual(sorted(h["id_or_file"] for h in self.find([], body=full)), ["c.md", "n.md", "u.md"])
 
     def test_gender_marker_normalised(self):
         d = TODAY.isoformat()

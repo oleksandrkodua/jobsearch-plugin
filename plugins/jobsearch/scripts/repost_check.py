@@ -7,7 +7,7 @@ Prints one 'possible repost' line per observation, or 'no repost found'. These a
 user to weigh, never a verdict. A tracker row matches when company and normalised title are equal; a ranked
 file matches the same way or, with --body-file, when the description fingerprints are equal. Titles are compared
 after dropping a gender marker such as "(m/f/d)". Ranked files are fingerprinted on their "## Description"
-section when present, else on the text minus Company/Title/Date/heading lines. Rows and files
+section (the last one, to end of file, so a "## " line inside the vacancy text stays part of it) when present, else on the text minus Company/Title/Date/heading lines. Rows and files
 with no parsable date are listed with date 'unknown', never dropped. Tracker and ranked dir come from the
 data dir (see datadir.py).
 """
@@ -22,7 +22,7 @@ STOPWORDS = frozenset("""a an and are as at be by for from in is it of on or tha
 и в на с со для по что как это мы вы ваш наш но или""".split())
 HEADER_RE = re.compile(r"^\s*(#.*|(company|title|date)\s*:.*)$", re.I)
 FIELD_RE = {k: re.compile(rf"^\s*{k}\s*:\s*(.+?)\s*$", re.I | re.M) for k in ("company", "title", "date")}
-DESC_RE = re.compile(r"^##[ \t]+Description[ \t]*$(.*?)(?=^##[ \t]|\Z)", re.I | re.M | re.S)
+DESC_RE = re.compile(r"^##[ \t]*Description[ \t]*\r?$(.*)\Z", re.I | re.M | re.S)  # last section: to end of file
 DATE_RE = re.compile(r"\d{4}-\d{2}-\d{2}")
 
 
