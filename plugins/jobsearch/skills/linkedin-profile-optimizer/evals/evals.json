@@ -1,0 +1,20 @@
+{
+  "skill_name": "linkedin-profile-optimizer",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Review a profile that says 'Built browser automation at Example Corp' when the supplied source says it was a personal proof of concept implemented with AI. Suggest a precise correction.",
+      "expected_output": "Flags the employer attribution and automation implications; grounds replacement text in the supplied source and distinguishes the user's role from AI implementation. Does not alter the profile."
+    },
+    {
+      "id": 2,
+      "prompt": "Will adding the same keyword ten times to About guarantee a top Recruiter result? The user wants to keep their emoji headings.",
+      "expected_output": "Does not promise ranking or recommend keyword stuffing. Explains that search depends on the query, filters and profile, preserves the requested style and cites current LinkedIn sources for platform claims."
+    },
+    {
+      "id": 3,
+      "prompt": "The user has a five-skill selection in About and asks whether they can add SQL and API testing elsewhere. Explain how to validate discovery.",
+      "expected_output": "Distinguishes the About selection from the separate Skills section and verifies current limits. Recommends grounded relevant skills and explains the limits of aggregate analytics and bounded Recruiter tests without inventing a score."
+    }
+  ]
+}
