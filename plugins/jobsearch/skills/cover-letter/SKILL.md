@@ -24,9 +24,9 @@ A letter for a specific vacancy, an adaptation of an existing letter, answers to
 2. **Parse the vacancy.** Title, domain, must-have vs nice-to-have, red flags, location requirements.
 3. **Pick the base letter** from the keys in `letters.base_letters`. If the vacancy domain matches none, use the first key marked as general, or ask the user. If the list is empty, say "no base letters configured" and write from the CV and facts alone.
 4. **Match against facts.** Strong matches and gaps separately. A gap is either addressed honestly or not mentioned. Never filled with invention.
-5. **Write the letter**, adapting the base text. Base texts are a style reference, not blocks to copy-paste: do not move passages verbatim between letters of one batch.
+5. **Write for this vacancy.** Use base letters for relevant experience and suitable tone, not a fixed rhetorical structure. Do not copy passages, aphoristic hooks, personal reactions or closing questions mechanically across a batch.
 6. **Self-check** against the checklist below.
-7. **Run the `humanizer` skill**: draft, self-check "what gives away AI text", final rewrite.
+7. **Run the `humanizer` skill**: draft, review generic/formulaic/unsupported wording, final rewrite. Preserve required facts and the user's supplied voice. Audit that final rewrite in step 8; re-audit any subsequent edits.
 8. **Run the `grounding-audit` skill** (script pass, then the semantic pass) before hand-over.
 
 ## Hard prohibitions
@@ -48,6 +48,15 @@ A letter for a specific vacancy, an adaptation of an existing letter, answers to
 - The letter language equals the vacancy language. If correspondence with the recruiter was in another language, ask before writing.
 - Vary openings and the way gaps are admitted inside one batch, so the letters do not read as a template.
 
+## Natural, grounded writing
+- Prefer concise wording within the configured length range. A user's explicit shorter request or form limit takes precedence; record the exception. Use the grounding script's `--no-length` only for that documented exception, verify the requested limit separately, and keep all factual checks enabled.
+- Open with a concrete overlap between the supplied vacancy and confirmed experience. Do not invent company needs or generic praise.
+- Do not add emotions, anecdotes, jokes, errors or digressions to imitate a human voice. Personal reactions are claims and require the author's confirmation.
+- Let relevant content determine structure. A witty opening, a three-part list, uneven paragraphs and a closing question are optional, not requirements.
+- Mention AI-assisted work when supported by the user's sources and relevant to the vacancy or explicitly requested by the user. Do not prescribe AI experience for every candidate or letter.
+- Keep employer work distinct from personal projects and concepts in development. Do not turn an intended efficiency benefit into a measured result or imply automation expertise without evidence.
+- Apply punctuation preferences from config as style choices. Neither punctuation, a scorecard nor a detector result guarantees human authorship or a recruiter's reaction.
+
 ## Part-time vacancies
 Open with direct framing: there is capacity next to the main job and an interest in the domain. Mark such vacancies separately from full-time ones in the list.
 
@@ -64,7 +73,7 @@ Per vacancy:
 [full text]
 
 ## Alternative opening
-[one spare hook]
+[one direct alternative tied to the vacancy]
 ```
 
 A batch goes out as one file, plain text or markdown, all letters together. Each letter body is one compact block without blank lines between paragraphs, so it pastes into an application form field. Separate PDFs only on explicit request; the plugin ships no PDF renderer, so say so and offer a text file.
