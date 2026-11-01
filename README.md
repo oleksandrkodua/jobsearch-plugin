@@ -6,7 +6,7 @@ Personal data (profile, tracker, applications, private config) lives in the user
 
 ## What's inside
 
-Most of the workflow lives in 8 slash commands, called as `/jobsearch:<name>`. The 4 skills are helpers: Claude uses them inside those commands, or on their own when you ask for that task directly. Scripts do the deterministic work (tracker edits, audits, reports), so the model never edits the tracker by hand.
+Most of the workflow lives in 8 slash commands, called as `/jobsearch:<name>`. The 5 skills are helpers: Claude uses them inside those commands, or on their own when you ask for that task directly. Scripts do the deterministic work (tracker edits, audits, reports), so the model never edits the tracker by hand.
 
 ### Commands
 
@@ -26,15 +26,22 @@ Most of the workflow lives in 8 slash commands, called as `/jobsearch:<name>`. T
 | Skill | What it does | Not for |
 |---|---|---|
 | `ats-screening` | ATS CV screening and job-match analysis, including PDF technical checks (text layer, hidden text, parsing risk). Reads English, Russian and Ukrainian. | Writing or rewriting a CV or letter (use `cover-letter`). |
-| `cover-letter` | Cover letters and application form answers for one vacancy, strictly from your facts file, master CV and letter knowledge base. Invents nothing, never sends. | CV scoring (`ats-screening`), fact-checking a finished text (`grounding-audit`), tracker updates (`outcome`). |
+| `cover-letter` | Concise cover letters and application form answers for one vacancy, strictly from your facts file, master CV and letter knowledge base. Humanizer preserves the facts; a final grounding audit checks the rewrite. Invents nothing, never sends. | CV scoring (`ats-screening`), fact-checking a finished text (`grounding-audit`), tracker updates (`outcome`). |
 | `grounding-audit` | Factual audit of CVs, letters and recruiter replies: every date, employer, metric, tool and claim is checked against your facts file and master CV, after the mechanical script pass. | Writing letters (`cover-letter`), ATS scoring (`ats-screening`). |
-| `humanizer` | Removes signs of AI-generated writing from a text (based on Wikipedia's "Signs of AI writing" guide). | Checking facts (`grounding-audit`), drafting a letter from scratch (`cover-letter`). |
+| `humanizer` | Edits formulaic wording while preserving the author's facts and supplied voice. Based on Wikipedia's "Signs of AI writing" guide; does not guarantee detector results. | Checking facts (`grounding-audit`), drafting a letter from scratch (`cover-letter`). |
+| `linkedin-profile-optimizer` | Reviews or drafts LinkedIn headlines, About, Experience and skills from supplied sources. Separates documented search behavior from recommendations and explains how to check discovery without invented ranking scores. | Sending messages, applying, or making unrequested profile edits. |
+
+For LinkedIn help, ask Claude to review the profile sections you provide using `linkedin-profile-optimizer`, for example: "Review my LinkedIn About and headline against my supplied CV; suggest only grounded changes." It is a skill, not an extra file in the slash-command directory. It prepares suggestions; it does not update your profile automatically.
 
 Plugin-level list with the scripts: `plugins/jobsearch/README.md`.
 
+### Session-start context
+
+The plugin includes a read-only SessionStart hook (`plugins/jobsearch/hooks/session_start.py`). In the configured job-search project it loads the overview and open TODO items into Claude's context on startup, resume, clear or compact. It stays silent in unrelated projects, on data/config errors, or when the project already defines its own SessionStart hook. Details: the "Session-start hook" section of `plugins/jobsearch/README.md`.
+
 ### Coming next
 
-Two approved addenda are designed but not built yet: CV tailoring (`docs/superpowers/specs/2026-10-28-cv-tailor-addendum.md`) and a career pack with a LinkedIn profile skill, career paths and `/upskill roadmap` (`docs/superpowers/specs/2026-10-28-career-pack-addendum.md`).
+The LinkedIn profile skill is available now. The remaining addendum work is not shipped: CV tailoring, including `/apply tune` (`docs/superpowers/specs/2026-10-28-cv-tailor-addendum.md`), plus career paths and `/upskill roadmap` (`docs/superpowers/specs/2026-10-28-career-pack-addendum.md`).
 
 ## Install
 
@@ -67,7 +74,7 @@ Never send or apply, facts only from the data folder, the tracker changes only t
 
 ## Opt-in alternative flow
 
-Board scanner, application assistant and reply watch are not part of the main cycle and are off by default: `docs/alternative-flow.md`.
+Portal auto-scanning, an application-form assistant and email reply-watch are planned later phases, not shipped features. Their opt-in design and approval gates are documented in `docs/alternative-flow.md`.
 
 ## Tests and validator
 
