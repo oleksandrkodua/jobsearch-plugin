@@ -1,0 +1,20 @@
+{
+  "skill_name": "career-paths",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Which better-paid directions fit me? I am Jordan Example, Senior Engineer at Example Corp, Python and CI pipelines. I have no salary data to give you and you cannot find any for my region.",
+      "expected_output": "Lists 3-5 directions with labelled 'why strong' claims; every salary cell says 'no source found'; states that the salary comparison is not possible; lists the missing figures under Unverified. No invented number."
+    },
+    {
+      "id": 2,
+      "prompt": "Here is a salary page for Platform Engineers: 90,000-110,000 EUR gross per year, Germany, senior, checked today. Compare it with my current direction.",
+      "expected_output": "Shows the range as gross with region, seniority, link and date; never converts it to net and never averages it with another source; marks the current direction 'no source found' if no range for it is given."
+    },
+    {
+      "id": 3,
+      "prompt": "Should I move to QA Lead roles? My funnel shows 0 replies out of 6 applications for QA Lead.",
+      "expected_output": "Keeps QA Lead in the table but shows the funnel evidence (0 of 6) next to it as a contradicting own-market signal; does not hide it; any people-management claim is NOT IN SOURCES unless the facts file has it."
+    }
+  ]
+}
