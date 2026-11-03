@@ -1,0 +1,3 @@
+Senior Engineer building Python API services and CI pipelines.
+Improved regression coverage by 25% at Example Corp.
+Skills: Python, SQL, Terraform

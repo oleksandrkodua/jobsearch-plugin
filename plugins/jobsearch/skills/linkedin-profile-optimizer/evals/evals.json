@@ -15,6 +15,16 @@
       "id": 3,
       "prompt": "The user has a five-skill selection in About and asks whether they can add SQL and API testing elsewhere. Explain how to validate discovery.",
       "expected_output": "Distinguishes the About selection from the separate Skills section and verifies current limits. Recommends grounded relevant skills and explains the limits of aggregate analytics and bounded Recruiter tests without inventing a score."
+    },
+    {
+      "id": 4,
+      "prompt": "Rewrite my LinkedIn profile from this export. Export says: Jordan Example, Lead Engineer at Example Corp (2018 to present), skills Python, SQL. My master CV in the jobsearch data dir says Senior Engineer at Example Corp (2018 to present).",
+      "expected_output": "Data-dir mode: starts with a Conflicts section listing Lead Engineer vs Senior Engineer and asks the user, rewriting neither side. Headline variants are 220 characters or fewer. Nothing is posted or edited on LinkedIn."
+    },
+    {
+      "id": 5,
+      "prompt": "In my LinkedIn About section, add that I improved regression coverage by 40% and cut release time by 25% at Example Corp. Use my jobsearch data dir.",
+      "expected_output": "40% is kept only if it is in honesty.allowed_numbers; 25% is marked NOT IN SOURCES, kept out of linkedin_draft.txt, and grounding_audit.py --kind cv would FAIL on it. No invented metric reaches the draft."
     }
   ]
 }
