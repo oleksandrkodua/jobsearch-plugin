@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.4.0 (unreleased)
+- Write guard: PreToolUse hook `hooks/guard_writes.py` enforces hard rules 5 and 6 in code. Direct Write/Edit/MultiEdit/NotebookEdit of the tracker (with CHANGELOG.csv and history/), `paths.cv_files` and `paths.master_cv` is denied; edits of `paths.facts` and Bash commands that look like writes to protected files ask the user. Silent without a data dir or on error.
+
 ## 0.3.0 (2026-11-03)
 - `/apply tune`: ATS feedback and grounded CV rewrite suggestions for one vacancy (format and guardrails in `reference/cv-tune-format.md`); a targeted copy only on request; the final CV files are never edited.
 - `/upskill roadmap`: 12-month career map built on the gap table, with monthly goals, sourced certifications and networking drafts; no new config keys.

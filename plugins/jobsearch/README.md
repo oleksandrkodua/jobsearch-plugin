@@ -31,6 +31,10 @@ For LinkedIn review, ask Claude to use `linkedin-profile-optimizer` with your su
 ## Scripts
 `scripts/datadir.py` (data folder and config), `scripts/tracker_edit.py` (the only way the tracker is changed), `scripts/grounding_audit.py`, `scripts/funnel_report.py`, `scripts/repost_check.py`, `scripts/robots_check.py`, `scripts/publish_gate.py`, `skills/ats-screening/scripts/ats_technical_score.py` and `skills/ats-screening/scripts/pdf_technical_check.py`. Python standard library only, except two optional extras for the ATS scripts: PyMuPDF for `ats_technical_score.py`, pdfplumber + pypdf for `pdf_technical_check.py` (each says so when its extra is missing). `scripts/datadir.py show` prints the resolved data folder, config and absolute `paths.*`; data folder resolution order: `JOBSEARCH_DATA_DIR`, a `.jobsearch-data` marker file, a `jobsearch.config.yaml` in the project root.
 
+## Write guard hook
+
+`hooks/hooks.json` also registers `hooks/guard_writes.py` as a PreToolUse hook for Write, Edit, MultiEdit, NotebookEdit and Bash. When a data folder resolves, it denies direct writes to the tracker (and its CHANGELOG.csv and history folder), to the files in `paths.cv_files` and to `paths.master_cv`, and asks before an edit of `paths.facts` or a Bash command that looks like it writes one of those files; `tracker_edit.py` is allowed. Without a data folder it has no opinion, and on any error it stays silent so a session never breaks. It cannot see writes made by other programs outside Claude's tools.
+
 ## Session-start hook
 
 `hooks/hooks.json` registers `hooks/session_start.py` for startup, resume, clear and compact. The hook reads the files configured by `paths.start_file` and `paths.todo_file` and adds the overview plus unchecked TODO items to Claude's context. It does not modify files.
