@@ -8,4 +8,4 @@
 6. CV files listed in `paths.cv_files` are read-only; targeted copies only when asked.
 7. No automated scraping before `robots_check.py` and a ToS read.
 
-Rules 5 and 6 are also enforced in code by the PreToolUse hook `hooks/guard_writes.py`: direct writes to the tracker (with its CHANGELOG.csv and history/), the files in `paths.cv_files` and `paths.master_cv` are denied; edits of `paths.facts`, and Bash commands that look like they write any of those files, ask the user first.
+Rules 5 and 6 are also enforced in code by the PreToolUse hook `hooks/guard_writes.py`: direct writes to the tracker (with its CHANGELOG.csv and history/), the files in `paths.cv_files` and `paths.master_cv` are denied; edits of `paths.facts`, and Bash commands that look like they write any of those files, ask the user first. Rule 1 is backed by the same hook: in the job-search project itself, browser or computer-use actions that click, type, fill or submit, and MCP tools that send or reply, ask the user first.

@@ -45,4 +45,4 @@ Matrix: requirement -> YES/PARTIAL/NO/UNCONFIRMED (label)
 Decision: APPLY | NOT APPLY | ASK THE USER - reason
 ```
 
-Batch mode: after the blocks, one table sorted by decision then match, and a count line (New / Possible duplicates / Already applied).
+Batch mode: at most 10 vacancies per run, so each one gets a full check within one context. With more, rank the first 10 in the order given, list the rest, and offer them as the next batch. After the blocks, one table sorted by decision then match, and a count line (New / Possible duplicates / Already applied).

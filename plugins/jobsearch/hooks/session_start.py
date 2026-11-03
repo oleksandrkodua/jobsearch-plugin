@@ -14,6 +14,8 @@ import sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "scripts"))
 import datadir  # noqa: E402
 
+MAX_OPEN_ITEMS = 30  # keep the session context small; the full list stays in the todo file
+
 
 def _same(a, b):
     return os.path.realpath(a) == os.path.realpath(b)
@@ -58,7 +60,9 @@ def context(project_root, env):
     if lang:
         text += f" Always answer in {lang}."
     text += (f"\n\n===== {start_rel} =====\n" + _read(datadir.data_path(cfg, d, "start_file"), start_rel)
-             + f"\n\n===== {todo_rel} open items ({len(open_items)}) =====\n" + "\n".join(open_items or ([todo] if todo.startswith("(missing:") else [])))
+             + f"\n\n===== {todo_rel} open items ({len(open_items)}) =====\n" + "\n".join(open_items[:MAX_OPEN_ITEMS] or ([todo] if todo.startswith("(missing:") else [])))
+    if len(open_items) > MAX_OPEN_ITEMS:
+        text += f"\n... and {len(open_items) - MAX_OPEN_ITEMS} more open items in {todo_rel}"
     return {
         "systemMessage": f"jobsearch: {start_rel} and {todo_rel} loaded ({len(open_items)} open items).",
         "hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": text},

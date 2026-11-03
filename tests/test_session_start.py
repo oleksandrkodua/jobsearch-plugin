@@ -71,6 +71,17 @@ class ContextCase(unittest.TestCase):
         self.assertIn("(3 open", out["systemMessage"])
         self.assertIn("answer in en", ctx)
 
+    def test_open_items_capped_at_30(self):
+        d = self.data_dir()
+        write(os.path.join(d, "TODO.md"), "".join(f"- [ ] item {i}\n" for i in range(45)))
+        out = session_start.context(d, {})
+        ctx = out["hookSpecificOutput"]["additionalContext"]
+        self.assertIn("open items (45)", ctx)
+        self.assertIn("- [ ] item 29", ctx)
+        self.assertNotIn("- [ ] item 30", ctx)
+        self.assertIn("... and 15 more open items in TODO.md", ctx)
+        self.assertIn("(45 open", out["systemMessage"])
+
     def test_no_language_line_when_chat_empty(self):
         d = self.data_dir(chat="")
         ctx = session_start.context(d, {})["hookSpecificOutput"]["additionalContext"]

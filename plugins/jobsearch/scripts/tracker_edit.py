@@ -8,14 +8,49 @@
 
 Every write: backup to history/ next to the tracker, append to CHANGELOG.csv there, print row count and
 status value_counts before/after and the list of rows whose status changed. Never deletes rows.
+add and set hold an exclusive lock file (<tracker>.lock) from read to write, so two sessions cannot
+lose each other's edit; a lock left by another session is reported and never removed by this tool.
 
 The tracker is the data dir's tracker file (see datadir.py). --file PATH works on any CSV without a data
 dir (use it on a copy); --config PATH selects the config file (id prefix, decided-by label).
 """
-import argparse, collections, copy, csv, datetime, difflib, os, re, shutil, sys
+import argparse, collections, contextlib, copy, csv, datetime, difflib, os, re, shutil, sys, time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import datadir  # noqa: E402
+
+LOCK_WAIT_SECONDS = 5
+
+
+@contextlib.contextmanager
+def tracker_lock(path):
+    """Exclusive lock for a read-modify-write of the tracker. Waits up to LOCK_WAIT_SECONDS, then refuses."""
+    lock = path + ".lock"
+    deadline = time.monotonic() + LOCK_WAIT_SECONDS
+    while True:
+        try:
+            fd = os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+            break
+        except FileExistsError:
+            if time.monotonic() >= deadline:
+                try:
+                    with open(lock, encoding="utf-8") as f:
+                        holder = f.read().strip() or "unknown"
+                except OSError:
+                    holder = "unknown"
+                raise EditError(f"tracker is locked by another session ({holder}). Retry when that edit is done. "
+                                f"If no other edit is running, the user can delete the lock file: {lock}")
+            time.sleep(0.2)
+    try:
+        os.write(fd, f"pid {os.getpid()} since {datetime.datetime.now().isoformat(timespec='seconds')}".encode())
+        os.close(fd)
+        yield
+    finally:
+        try:
+            os.remove(lock)
+        except OSError:
+            pass
+
 
 STATUSES = ["ACTIVE", "APPLIED", "NO_RESPONSE", "REJECTED", "DECLINED", "CLOSED", "SKIPPED", "NOT_APPLIED", "DO_NOT_APPLY", "UNKNOWN"]
 
@@ -213,15 +248,13 @@ def main(argv=None, env=None, cwd=None):
         cfg, path = settings(a, os.environ if env is None else env, cwd or os.getcwd())
         if not os.path.isfile(path):
             raise EditError(f"tracker file not found: {path}")
-        cols, rows, bom = load(path)
-        if a.cmd == "find":
-            cmd_find(a, cols, rows)
-        elif a.cmd == "add":
-            cmd_add(a, cols, rows, path, bom, cfg)
-        elif a.cmd == "set":
-            cmd_set(a, cols, rows, path, bom, cfg)
+        if a.cmd in ("add", "set"):
+            with tracker_lock(path):
+                cols, rows, bom = load(path)
+                (cmd_add if a.cmd == "add" else cmd_set)(a, cols, rows, path, bom, cfg)
         else:
-            cmd_check(cols, rows)
+            cols, rows, bom = load(path)
+            (cmd_find(a, cols, rows) if a.cmd == "find" else cmd_check(cols, rows))
     except (EditError, datadir.DataDirError, ValueError, OSError) as e:
         print(f"error: {e}", file=sys.stderr)
         return 1

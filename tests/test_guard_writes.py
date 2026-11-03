@@ -109,6 +109,43 @@ class BashTool(GuardCase):
         self.assertIsNone(self.decide("Bash", {"command": "echo hi > reports/out.md"}))
 
 
+class OutreachTools(GuardCase):
+    def in_project(self, tool, tool_input):
+        return guard_writes.decide(tool, tool_input, self.dd, self.env)  # project root = the data dir
+
+    def test_clicks_types_and_sends_ask_in_the_data_project(self):
+        for tool, ti in (("mcp__claude-in-chrome__computer", {"action": "left_click", "coordinate": [1, 2]}),
+                         ("mcp__Claude_Browser__computer", {"action": "type", "text": "x"}),
+                         ("mcp__plugin_playwright_playwright__browser_click", {"element": "Apply"}),
+                         ("mcp__plugin_playwright_playwright__browser_fill_form", {}),
+                         ("mcp__claude-in-chrome__form_input", {"ref": "r1", "value": "x"}),
+                         ("mcp__Claude_Browser__browser_batch", {"actions": [{"name": "computer", "input": {"action": "left_click"}}]}),
+                         ("mcp__computer-use__app_click", {}),
+                         ("mcp__gmail__send_message", {"to": "a@example.com"}),
+                         ("mcp__slack__reply", {})):
+            decision, reason = self.in_project(tool, ti) or (None, "")
+            self.assertEqual(decision, "ask", tool)
+            self.assertIn("never send, apply or submit", reason)
+
+    def test_reading_and_navigation_allowed(self):
+        for tool, ti in (("mcp__claude-in-chrome__computer", {"action": "screenshot"}),
+                         ("mcp__Claude_Browser__get_page_text", {}),
+                         ("mcp__Claude_Browser__navigate", {"url": "https://example.com"}),
+                         ("mcp__plugin_playwright_playwright__browser_snapshot", {}),
+                         ("mcp__notion__search", {"query": "send"})):
+            self.assertIsNone(self.in_project(tool, ti), tool)
+
+    def test_other_projects_are_not_affected(self):
+        decision = guard_writes.decide("mcp__plugin_playwright_playwright__browser_click", {}, self.proj, self.env)
+        self.assertIsNone(decision)
+
+    def test_marker_project_counts_as_the_data_project(self):
+        with open(os.path.join(self.proj, ".jobsearch-data"), "w", encoding="utf-8") as f:
+            f.write(self.dd)
+        decision = guard_writes.decide("mcp__claude-in-chrome__computer", {"action": "left_click"}, self.proj, {})
+        self.assertEqual(decision[0], "ask")
+
+
 class HookProcess(GuardCase):
     def run_hook(self, payload, env):
         e = {k: v for k, v in os.environ.items() if not k.startswith("JOBSEARCH_")}
@@ -134,9 +171,11 @@ class HookProcess(GuardCase):
     def test_registered_in_hooks_json(self):
         with open(os.path.join(PLUGIN, "hooks", "hooks.json"), encoding="utf-8") as f:
             pre = json.load(f)["hooks"]["PreToolUse"]
-        self.assertEqual(len(pre), 1)
+        self.assertEqual(len(pre), 2)
         self.assertEqual(set(pre[0]["matcher"].split("|")), {"Write", "Edit", "MultiEdit", "NotebookEdit", "Bash"})
-        self.assertEqual(pre[0]["hooks"][0]["command"], 'python3 "${CLAUDE_PLUGIN_ROOT}/hooks/guard_writes.py"')
+        self.assertEqual(pre[1]["matcher"], "mcp__.*")
+        for entry in pre:
+            self.assertEqual(entry["hooks"][0]["command"], 'python3 "${CLAUDE_PLUGIN_ROOT}/hooks/guard_writes.py"')
 
 
 if __name__ == "__main__":

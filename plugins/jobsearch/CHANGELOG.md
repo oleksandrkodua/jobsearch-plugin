@@ -2,6 +2,10 @@
 
 ## 0.4.0 (unreleased)
 - Write guard: PreToolUse hook `hooks/guard_writes.py` enforces hard rules 5 and 6 in code. Direct Write/Edit/MultiEdit/NotebookEdit of the tracker (with CHANGELOG.csv and history/), `paths.cv_files` and `paths.master_cv` is denied; edits of `paths.facts` and Bash commands that look like writes to protected files ask the user. Silent without a data dir or on error.
+- Outreach guard (same hook): in the job-search project, browser / computer-use clicks, typing, form filling and submits, and MCP send/reply tools, ask the user first (hard rule 1).
+- Tracker lock: `tracker_edit.py add/set` hold an exclusive `<tracker>.lock` from read to write, so two sessions cannot lose each other's edit; a foreign lock is reported, never removed.
+- `/rank` batch mode is capped at 10 vacancies per run; the rest is offered as the next batch.
+- SessionStart hook shows at most 30 open TODO items plus a count of the rest.
 
 ## 0.3.0 (2026-11-03)
 - `/apply tune`: ATS feedback and grounded CV rewrite suggestions for one vacancy (format and guardrails in `reference/cv-tune-format.md`); a targeted copy only on request; the final CV files are never edited.

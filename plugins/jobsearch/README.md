@@ -33,7 +33,7 @@ For LinkedIn review, ask Claude to use `linkedin-profile-optimizer` with your su
 
 ## Write guard hook
 
-`hooks/hooks.json` also registers `hooks/guard_writes.py` as a PreToolUse hook for Write, Edit, MultiEdit, NotebookEdit and Bash. When a data folder resolves, it denies direct writes to the tracker (and its CHANGELOG.csv and history folder), to the files in `paths.cv_files` and to `paths.master_cv`, and asks before an edit of `paths.facts` or a Bash command that looks like it writes one of those files; `tracker_edit.py` is allowed. Without a data folder it has no opinion, and on any error it stays silent so a session never breaks. It cannot see writes made by other programs outside Claude's tools.
+`hooks/hooks.json` also registers `hooks/guard_writes.py` as a PreToolUse hook for Write, Edit, MultiEdit, NotebookEdit and Bash. When a data folder resolves, it denies direct writes to the tracker (and its CHANGELOG.csv and history folder), to the files in `paths.cv_files` and to `paths.master_cv`, and asks before an edit of `paths.facts` or a Bash command that looks like it writes one of those files; `tracker_edit.py` is allowed. Without a data folder it has no opinion, and on any error it stays silent so a session never breaks. In the job-search project itself (the data folder, or a project with the `.jobsearch-data` marker) it also asks before browser or computer-use actions that click, type, fill or submit, and before MCP tools that send or reply, so an Apply or Send control stays the user's (hard rule 1); other projects are not affected. It cannot see writes made by other programs outside Claude's tools.
 
 ## Session-start hook
 

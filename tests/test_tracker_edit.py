@@ -6,6 +6,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCRIPTS = os.path.join(ROOT, "plugins", "jobsearch", "scripts")
@@ -232,6 +233,43 @@ class FixRound1Test(TrackerCase):
         env.update(extra, PYTHONIOENCODING="utf-8", PYTHONDONTWRITEBYTECODE="1")
         p = subprocess.run([sys.executable, "-B", SCRIPT, *args], capture_output=True, cwd=self.dd, env=env)
         return p.returncode, p.stdout.decode("utf-8"), p.stderr.decode("utf-8")
+
+
+class LockTest(TrackerCase):
+    """Two sessions must not lose each other's edit: writes hold an exclusive lock next to the tracker."""
+
+    def lock_path(self):
+        return self.csv + ".lock"
+
+    def call(self, *argv):
+        err = io.StringIO()
+        with mock.patch.object(tracker_edit, "LOCK_WAIT_SECONDS", 0), mock.patch("sys.stderr", err), \
+                mock.patch("sys.stdout", io.StringIO()):
+            code = tracker_edit.main(list(argv), env={}, cwd=self.dd)
+        return code, err.getvalue()
+
+    def test_write_refused_while_locked_and_tracker_untouched(self):
+        with open(self.lock_path(), "w", encoding="utf-8") as f:
+            f.write("pid 1 since 2026-11-04T10:00:00")
+        before = self.read_bytes()
+        code, err = self.call("set", "VAC-001", "notes_csv", "x")
+        self.assertEqual(code, 1)
+        self.assertIn("locked by another session", err)
+        self.assertIn(self.lock_path(), err)
+        self.assertEqual(self.read_bytes(), before)
+        self.assertTrue(os.path.exists(self.lock_path()), "a foreign lock is never removed")
+
+    def test_lock_released_after_write_and_after_error(self):
+        self.assertEqual(self.call("set", "VAC-001", "notes_csv", "x")[0], 0)
+        self.assertFalse(os.path.exists(self.lock_path()))
+        self.assertEqual(self.call("set", "VAC-999", "notes_csv", "x")[0], 1)
+        self.assertFalse(os.path.exists(self.lock_path()))
+
+    def test_reads_ignore_the_lock(self):
+        with open(self.lock_path(), "w", encoding="utf-8") as f:
+            f.write("pid 1")
+        self.assertEqual(self.call("check")[0], 0)
+        self.assertEqual(self.call("find", "--company", "Northwind Labs")[0], 0)
 
 
 if __name__ == "__main__":
