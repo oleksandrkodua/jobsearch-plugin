@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.4.0 (unreleased)
+## 0.4.0 (2026-11-04)
 - Write guard: PreToolUse hook `hooks/guard_writes.py` enforces hard rules 5 and 6 in code. Direct Write/Edit/MultiEdit/NotebookEdit of the tracker (with CHANGELOG.csv and history/), `paths.cv_files` and `paths.master_cv` is denied; edits of `paths.facts` and Bash commands that look like writes to protected files ask the user. Silent without a data dir or on error.
 - Outreach guard (same hook): in the job-search project, browser / computer-use clicks, typing, form filling and submits, and MCP send/reply tools, ask the user first (hard rule 1).
 - Tracker lock: `tracker_edit.py add/set` hold an exclusive `<tracker>.lock` from read to write, so two sessions cannot lose each other's edit; a foreign lock is reported, never removed.
