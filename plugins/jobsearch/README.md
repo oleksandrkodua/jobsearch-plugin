@@ -6,15 +6,15 @@ A neutral job-search engine for any profession. It triages vacancies, drafts hon
 Point the plugin at your private data folder with `JOBSEARCH_DATA_DIR`. Put your settings in `jobsearch.config.yaml` inside it, or set `JOBSEARCH_CONFIG` to a config file kept elsewhere. Start from `reference/config.template.yaml` (or run `/jobsearch:jobsearch-setup`, which copies and validates it); to re-check a copy later, run the plugin's `scripts/datadir.py` with `validate PATH`. Layout and `paths.*` keys: `reference/data-contract.md`.
 
 ## Commands and skills
-The plugin has 8 commands (`/jobsearch:<name>`) and 5 skills. Most of the workflow lives in the commands; the skills are helpers used inside them or on request. Full tables: the "What's inside" section of the root `README.md`.
+The plugin has 8 commands (`/jobsearch:<name>`) and 6 skills. Most of the workflow lives in the commands; the skills are helpers used inside them or on request. Full tables: the "What's inside" section of the root `README.md`.
 
 Commands:
 - `commands/rank.md` - triage a vacancy: duplicate check, legitimacy, blockers, match %, verdict.
-- `commands/apply.md` - letter draft, optional targeted CV copy, grounding audit, hand-over (not sent).
+- `commands/apply.md` - letter draft, optional targeted CV copy, grounding audit, hand-over (not sent); mode `tune` for grounded CV suggestions (format in `reference/cv-tune-format.md`).
 - `commands/outcome.md` - record a reply, rejection, interview or silence in the tracker.
 - `commands/followup.md` - applications waiting for an answer, follow-up drafts.
 - `commands/interview.md` - interview support: `prep` (questions mapped to the story bank), `debrief` (capture and tag gaps), `redflags` (employer checklist).
-- `commands/upskill.md` - skill-gap heat map from rejections, with a learning plan.
+- `commands/upskill.md` - skill-gap heat map from rejections, with a learning plan; mode `roadmap` for a 12-month career map.
 - `commands/funnel.md` - funnel and patterns report from the tracker.
 - `commands/jobsearch-setup.md` - create the data folder skeleton.
 
@@ -24,6 +24,7 @@ Skills:
 - `skills/grounding-audit/` - claim-by-claim check against your facts.
 - `skills/humanizer/` - edits formulaic wording while preserving facts and the author's supplied voice; no detector guarantee (MIT, see its `LICENSE`).
 - `skills/linkedin-profile-optimizer/` - reviews or drafts supplied LinkedIn headline, About, Experience and skills sections from verified sources; distinguishes documented search behavior from recommendations. No automatic profile changes or ranking promises.
+- `skills/career-paths/` - better-paid directions that fit your experience, salary only with source and date.
 
 For LinkedIn review, ask Claude to use `linkedin-profile-optimizer` with your supplied profile sections and source CV. This is a skill, not an additional file in `commands/`.
 
@@ -38,7 +39,7 @@ It runs only when the current project is the resolved data folder or contains a 
 
 ## Planned features
 
-The LinkedIn profile skill is included. CV tailoring (`/apply tune`), career paths and `/upskill roadmap` remain addendum work, not shipped modes. Portal auto-scanning, an application-form assistant and email reply-watch are later opt-in designs; see the root README and [alternative-flow design](../../docs/alternative-flow.md) for their status and approval gates.
+CV tailoring (`apply tune`), `upskill roadmap`, the LinkedIn data-dir mode and `career-paths` are shipped. Portal auto-scanning, an application-form assistant and email reply-watch are later opt-in designs; see the root README and [alternative-flow design](../../docs/alternative-flow.md) for their status and approval gates.
 
 ## Rules
 The hard rules are in `reference/hard-rules.md` and cannot be switched off by config. Tracker statuses: `reference/statuses.md`. Changes: `CHANGELOG.md`.

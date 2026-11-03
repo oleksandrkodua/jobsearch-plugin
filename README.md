@@ -6,18 +6,18 @@ Personal data (profile, tracker, applications, private config) lives in the user
 
 ## What's inside
 
-Most of the workflow lives in 8 slash commands, called as `/jobsearch:<name>`. The 5 skills are helpers: Claude uses them inside those commands, or on their own when you ask for that task directly. Scripts do the deterministic work (tracker edits, audits, reports), so the model never edits the tracker by hand.
+Most of the workflow lives in 8 slash commands, called as `/jobsearch:<name>`. The 6 skills are helpers: Claude uses them inside those commands, or on their own when you ask for that task directly. Scripts do the deterministic work (tracker edits, audits, reports), so the model never edits the tracker by hand.
 
 ### Commands
 
 | Command | What it does | Typical use |
 |---|---|---|
 | `rank` | Triages one or more vacancies (URL, pasted text, screenshot): host check, legitimacy observations, repost and duplicate check, blockers from config, requirement matrix, match %, verdict APPLY / NOT APPLY / ASK THE USER. Writes no CV and no letter. | You found a vacancy and want to know whether it is worth applying. |
-| `apply` | Prepares one application: ATS pass, optional targeted CV copy, cover letter (drafter, reviewer, humanizer passes), then a mandatory grounding audit before hand-over. Never sends. | The verdict is APPLY and you want the letter and a checklist ready to send yourself. |
+| `apply` | Prepares one application: ATS pass, optional targeted CV copy, cover letter (drafter, reviewer, humanizer passes), then a mandatory grounding audit before hand-over. Never sends. Mode `tune`: ATS feedback and grounded CV rewrite suggestions for one vacancy; a targeted CV copy only on request. | The verdict is APPLY and you want the letter and a checklist ready to send yourself. |
 | `outcome` | Records a reply, rejection, interview or silence in the tracker with valid statuses, via `tracker_edit.py`. Offers `/interview debrief` after an interview. | A company answered, or you decided it will not. |
 | `followup` | Lists applications waiting for an answer for N days and drafts a short follow-up. Draft only. | A week or two passed with no reply. |
 | `interview` | Interview support for a tracked application, in three modes. `prep` (default): likely questions mapped to your story bank, consistency brief, gap bridges, questions to ask, optional mock interview. `debrief`: captures what was asked and what went badly, writes a debrief file, tags gaps. `redflags`: checks the employer against your blockers and red-flag list as SEEN / NOT SEEN / ASK. | Before a call (`prep`), right after it (`debrief`), or when something feels off about an employer (`redflags`). |
-| `upskill` | Skill-gap heat map from your real rejections and declined vacancies, with a prioritized learning plan and study order. Aggregate mode, or one vacancy URL. | You want to know which gaps actually cost you vacancies. |
+| `upskill` | Skill-gap heat map from your real rejections and declined vacancies, with a prioritized learning plan and study order. Aggregate mode, one vacancy URL, or `roadmap`: a 12-month career map with monthly goals, certifications and networking. | You want to know which gaps actually cost you vacancies. |
 | `funnel` | Read-only funnel report from the tracker: stages, reply rate by host class and role type, rejection reasons by gap tag, median days to first reply. | You want the numbers and patterns across all applications. |
 | `jobsearch-setup` | Creates a new data folder skeleton (profile, tracker header, config from the template, optional preset). Refuses any folder that is not new or empty. | First run, once. |
 
@@ -29,7 +29,8 @@ Most of the workflow lives in 8 slash commands, called as `/jobsearch:<name>`. T
 | `cover-letter` | Concise cover letters and application form answers for one vacancy, strictly from your facts file, master CV and letter knowledge base. Humanizer preserves the facts; a final grounding audit checks the rewrite. Invents nothing, never sends. | CV scoring (`ats-screening`), fact-checking a finished text (`grounding-audit`), tracker updates (`outcome`). |
 | `grounding-audit` | Factual audit of CVs, letters and recruiter replies: every date, employer, metric, tool and claim is checked against your facts file and master CV, after the mechanical script pass. | Writing letters (`cover-letter`), ATS scoring (`ats-screening`). |
 | `humanizer` | Edits formulaic wording while preserving the author's facts and supplied voice. Based on Wikipedia's "Signs of AI writing" guide; does not guarantee detector results. | Checking facts (`grounding-audit`), drafting a letter from scratch (`cover-letter`). |
-| `linkedin-profile-optimizer` | Reviews or drafts LinkedIn headlines, About, Experience and skills from supplied sources. Separates documented search behavior from recommendations and explains how to check discovery without invented ranking scores. | Sending messages, applying, or making unrequested profile edits. |
+| `linkedin-profile-optimizer` | Reviews or drafts LinkedIn headlines, About, Experience and skills from supplied sources. Separates documented search behavior from recommendations and explains how to check discovery without invented ranking scores. With a jobsearch data dir it lists conflicts with the master CV first, traces every line to the master CV or facts file (else NOT IN SOURCES) and runs the grounding audit. | Sending messages, applying, or making unrequested profile edits. |
+| `career-paths` | Recommends 3-5 better-paid directions that fit your experience and gap table, with labelled evidence for each; salary figures only with source link, date, region and gross/net, never converted or averaged. | One vacancy's fit (`rank`), a study plan (`upskill`), offer negotiation. |
 
 For LinkedIn help, ask Claude to review the profile sections you provide using `linkedin-profile-optimizer`, for example: "Review my LinkedIn About and headline against my supplied CV; suggest only grounded changes." It is a skill, not an extra file in the slash-command directory. It prepares suggestions; it does not update your profile automatically.
 
@@ -41,7 +42,7 @@ The plugin includes a read-only SessionStart hook (`plugins/jobsearch/hooks/sess
 
 ### Coming next
 
-The LinkedIn profile skill is available now. The remaining addendum work is not shipped: CV tailoring, including `/apply tune` (`docs/superpowers/specs/2026-10-28-cv-tailor-addendum.md`), plus career paths and `/upskill roadmap` (`docs/superpowers/specs/2026-10-28-career-pack-addendum.md`).
+Both approved addenda are shipped: CV tailoring (`/apply tune`) and the career pack (`/upskill roadmap`, the data-dir mode of `linkedin-profile-optimizer`, `career-paths`). The next planned phases are portal auto-scanning, an application-form assistant and email reply-watch; see `docs/alternative-flow.md`.
 
 ## Install
 

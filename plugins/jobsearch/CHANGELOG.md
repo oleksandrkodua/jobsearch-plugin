@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.0 (unreleased)
+- `/apply tune`: ATS feedback and grounded CV rewrite suggestions for one vacancy (format and guardrails in `reference/cv-tune-format.md`); a targeted copy only on request; the final CV files are never edited.
+- `/upskill roadmap`: 12-month career map built on the gap table, with monthly goals, sourced certifications and networking drafts; no new config keys.
+- `linkedin-profile-optimizer`: data-dir mode (conflicts first, every line traced to the master CV or facts, `grounding_audit.py --kind cv` on the draft).
+- Skills: career-paths (sourced salary ranges only, own-market signal from the funnel report).
+
 ## 0.2.0 (2026-11-03)
 - LinkedIn profile optimizer skill (fifth skill) with three synthetic evaluation prompts: grounded profile review, documented search behavior, no ranking guarantees or automatic profile edits.
 - Cover-letter and humanizer guidance: concise vacancy-specific wording, no invented personal reactions, factual review after rewriting, no detector guarantees; punctuation follows the user's config.
