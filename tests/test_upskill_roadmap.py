@@ -31,6 +31,13 @@ class RoadmapDocs(unittest.TestCase):
                   "hours per week", "start month", "No new config keys"):
             self.assertIn(w, RM, w)
 
+    def test_roadmap_direction_and_no_overwrite(self):
+        self.assertIn("treat it as the target for this run", RM)
+        self.assertIn("latest aggregate", RM)
+        self.assertIn("never overwrite an existing file", RM.lower())
+        desc = [l for l in CMD.splitlines() if l.startswith("description:")][0]
+        self.assertIn("roadmap [direction]", desc)
+
     def test_roadmap_output(self):
         for w in ("roadmap_<YYYY-MM-DD>.md", "12-row table",
                   "| Month | Goal | Gap id(s) | Done when | Hours | Resource |",

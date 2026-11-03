@@ -46,7 +46,9 @@ class LinkedinDocs(unittest.TestCase):
 
     def test_mode_conflicts_first_and_audit(self):
         self.assertLess(MODE.index("Conflicts"), MODE.index("Headline"))
-        self.assertIn('python3 "${CLAUDE_PLUGIN_ROOT}/scripts/grounding_audit.py" <paths.reports>/linkedin_draft.txt --kind cv', MODE)
+        self.assertIn('python3 "${CLAUDE_PLUGIN_ROOT}/scripts/grounding_audit.py" <paths.reports>/linkedin_draft_<YYYY-MM-DD>.txt --kind cv', MODE)
+        self.assertIn("into the \"Audit result\" section of `linkedin_<YYYY-MM-DD>.md`, not into an application folder's `audit.txt`", MODE)
+        self.assertIn("If no export path is given", MODE)
         self.assertIn("linkedin_<YYYY-MM-DD>.md", MODE)
         self.assertIn("open FAIL", MODE)
 

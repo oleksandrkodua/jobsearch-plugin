@@ -1,5 +1,5 @@
 ---
-description: Skill-gap heat map from the user's real rejections and declined vacancies (gap table in the facts file plus the tracker), with a prioritized learning plan. Aggregate mode or one vacancy URL.
+description: Skill-gap heat map from the user's real rejections and declined vacancies (gap table in the facts file plus the tracker), with a prioritized learning plan. Aggregate mode or one vacancy URL. Mode `roadmap [direction]`: 12-month career map.
 argument-hint: [vacancy URL | roadmap [direction]]   (no argument = aggregate over the tracker)
 ---
 
@@ -39,7 +39,8 @@ Aggregate: `<paths.reports>/upskill_<YYYY-MM-DD>.md`. Targeted: `<paths.reports>
 ## Mode `roadmap` (12-month career map)
 `/upskill roadmap [direction]`. The direction is optional; it can come from the `career-paths` skill. No new config keys: ask in chat for the time budget (hours per week) and the start month, and write both into the report header. On the next run, read them back from the previous `roadmap_*.md` and confirm them with the user.
 
-R1. **Heat map.** Run Steps 2-5 of aggregate mode, or reuse the latest `upskill_<date>.md` in `paths.reports` if it is less than 30 days old (name the file used).
+R1. **Heat map.** Run Steps 2-5 of aggregate mode, or reuse the latest aggregate `upskill_<date>.md` in `paths.reports` (not a single-vacancy `upskill_<date>_<company>_<role>.md`) only if it is less than 30 days old AND no direction was given; otherwise run Steps 2-5 (name the file used).
+   When a direction is given, treat it as the target for this run: rank gaps by the Step 5 rule against that direction instead of `targets`, and say so in the report header.
 R2. **Decision gate.** If the direction is in `targets.roles_not_primary`, apply the Step 5 decision gate first. A roadmap is built only after the user picks path (c).
 R3. **Monthly goals.** A 12-row table: `| Month | Goal | Gap id(s) | Done when | Hours | Resource |`.
    - Critical gaps go in months 1-3, and interview-performance gaps come first (quick wins).
@@ -53,6 +54,6 @@ R5. **Networking strategy.**
    - Message drafts only: never sent or posted (hard rule 1).
    - No private individuals named unless the user named them.
 R6. **Quarterly checkpoints.** Months 3, 6, 9 and 12: re-run `/upskill` and `/funnel`, compare with this roadmap, and say what to drop.
-R7. **Save** `<paths.reports>/roadmap_<YYYY-MM-DD>.md` with these sections: header (direction, time budget, start month, heat-map file), "Monthly goals", "Certifications", "Networking strategy", "Quarterly checkpoints", "Unverified" (what could not be confirmed and where it was looked for). Confirm the path in chat.
+R7. **Save** `<paths.reports>/roadmap_<YYYY-MM-DD>.md` with these sections: header (direction, time budget, start month, heat-map file), "Monthly goals", "Certifications", "Networking strategy", "Quarterly checkpoints", "Unverified" (what could not be confirmed and where it was looked for). Never overwrite an existing file; add a suffix (`_2`, `_3`). Confirm the path in chat.
 
 The hard rules above hold: studying is not a claim, and planning a certification is not a claim either. A skill or certificate becomes claimable only after the user states the evidence and adds it to the facts file. No invented gap history, no invented resources.

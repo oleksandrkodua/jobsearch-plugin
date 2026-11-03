@@ -1,8 +1,9 @@
 # `/apply tune` report format and guardrails
 
-Used by `/apply tune`. Two files go into `<paths.applications>/<company>_<role>/`:
+Used by `/apply tune`. Three files go into `<paths.applications>/<company>_<role>/`. Never overwrite an existing file; add a suffix (`_2`, `_3`).
 - `cv_tune.md` - the report, sections 1-6 below, in this order;
-- `cv_tune_bullets.md` - only the Improved lines and the proposed Summary and Skills text, one item per line. This is the file the grounding audit checks; it never holds Original lines.
+- `cv_tune_bullets.md` - only the Improved lines and the proposed Summary and Skills text, one item per line. This is the file the grounding audit checks; it never holds Original lines;
+- `audit_tune.txt` - the audit record: both audit results and how each WARN was resolved.
 
 ## 1. Match score
 `Job Match XX/100` and `Candidate Quality XX/100`, copied from the `ats-screening` Stage 2 run, with its formula line. Not recomputed.
@@ -33,7 +34,7 @@ A block with `NOT IN SOURCES` is shown but marked not usable, and it never goes 
 5-10 items, ordered by Job Match impact: must-have evidence first, then required keywords, then preferred keywords, then wording. Each item names its section and the bullet it touches.
 
 ## 6. Audit and risk lines
-The `grounding_audit.py --kind cv` result on `cv_tune_bullets.md`, the `grounding-audit` skill result, the list of NOT IN SOURCES items, and the risk-line warning from `/apply` step 3 (once per application).
+The `grounding_audit.py --kind cv` result on `cv_tune_bullets.md` (recorded in `audit_tune.txt`), the `grounding-audit` skill result, the list of NOT IN SOURCES items, and the risk-line warning from `/apply` step 3 (once per application).
 
 ## Guardrails (not configurable)
 1. **No keyword stuffing:**

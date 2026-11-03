@@ -42,10 +42,15 @@ class CareerPathsDocs(unittest.TestCase):
                   "NOT IN SOURCES", "never edits `targets`"):
             self.assertIn(w, SKILL, w)
 
+    def test_no_overwrite_and_plugin_root(self):
+        self.assertIn("never overwrite an existing file", SKILL)
+        self.assertIn("${CLAUDE_PLUGIN_ROOT}/scripts/robots_check.py", SKILL)
+
     def test_evals(self):
         ev = json.loads(read(SKILL_DIR, "evals", "evals.json"))
         self.assertEqual(ev["skill_name"], "career-paths")
         self.assertEqual(len(ev["evals"]), 3)
+        self.assertIn("https://example.com/salary/platform-engineer", ev["evals"][1]["prompt"])
 
 
 if __name__ == "__main__":

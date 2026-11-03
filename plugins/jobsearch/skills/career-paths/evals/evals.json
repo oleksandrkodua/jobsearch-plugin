@@ -8,7 +8,7 @@
     },
     {
       "id": 2,
-      "prompt": "Here is a salary page for Platform Engineers: 90,000-110,000 EUR gross per year, Germany, senior, checked today. Compare it with my current direction.",
+      "prompt": "Here is a salary page for Platform Engineers: 90,000-110,000 EUR gross per year, Germany, senior, source https://example.com/salary/platform-engineer, checked 2026-11-03. Compare it with my current direction.",
       "expected_output": "Shows the range as gross with region, seniority, link and date; never converts it to net and never averages it with another source; marks the current direction 'no source found' if no range for it is given."
     },
     {

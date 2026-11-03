@@ -37,6 +37,14 @@ class ApplyTuneDocs(unittest.TestCase):
                   "as in Gate 0 and step 1", "every WARN is resolved in writing"):
             self.assertIn(w, TUNE, w)
 
+    def test_tune_audit_file_and_no_overwrite(self):
+        self.assertIn("audit_tune.txt", TUNE)
+        self.assertIn("audit_tune.txt", FMT)
+        self.assertIn("Never overwrite an existing file", TUNE)
+        self.assertEqual(TUNE.count("audit.txt"), 1)  # only the "not audit.txt" pointer remains
+        desc = [l for l in CMD.splitlines() if l.startswith("description:")][0]
+        self.assertIn("Mode `tune`", desc)
+
     def test_tune_never_edits_final_cv(self):
         self.assertIn("Never edit the files in `paths.cv_files` or the master CV", TUNE)
         self.assertIn("only when the user asks", TUNE)

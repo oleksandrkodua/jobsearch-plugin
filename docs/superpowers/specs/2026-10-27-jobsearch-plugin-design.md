@@ -1,6 +1,6 @@
 # jobsearch plugin - design spec
 
-Status: APPROVED by the owner 2026-10-27 (Q1 private GitHub repo, changed 2026-10-28 to a public engine repo plus a separate private repo for the owner config, Q2 name `jobsearch`, Q3 default config location). No code yet. Addenda approved 2026-10-28: `2026-10-28-cv-tailor-addendum.md`, `2026-10-28-career-pack-addendum.md` (built after the main plan, Tasks 0-14).
+Status: APPROVED by the owner 2026-10-27 (Q1 private GitHub repo, changed 2026-10-28 to a public engine repo plus a separate private repo for the owner config, Q2 name `jobsearch`, Q3 default config location). No code yet. Addenda approved 2026-10-28: `2026-10-28-cv-tailor-addendum.md`, `2026-10-28-career-pack-addendum.md` (built after the main plan, Tasks 0-14). Changed 2026-11-03: the LinkedIn part of the career pack extends the existing skill `linkedin-profile-optimizer` (data-dir mode) instead of a new `skills/linkedin-profile/`.
 Repo location: the repo folder, a separate repo as the owner chose (the only folder outside the source workspace that the session's write guard allows - can be moved before `git init`).
 Convention used in this file: the spec never quotes the owner's personal values (name, contacts, employers, salary figures, vacancy ids). Inventory items are named by file, line and type. The owner's workspace is referred to as **the source workspace**; its path is read at run time from `JOBSEARCH_DATA_DIR`, never written into this repo.
 
