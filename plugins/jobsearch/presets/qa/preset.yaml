@@ -46,6 +46,7 @@ match_weights: {must_have: 60, nice_to_have: 10, seniority: 10, domain: 10, form
 thresholds: {apply: 80, decline: 65}
 
 portals:
+  # job_portals / employer_ats accept portal names ("LinkedIn") or hosts ("jobs.example.org"). Dotted entry = that host or any subdomain (leading www./*. ignored); dotless name = normalised (lowercase, no spaces . - _) equal to a whole host label, or that label + hq/jobs/careers; the last label (TLD) is never used for names.
   job_portals: []
   employer_ats: [greenhouse, lever, workable, ashby, recruitee, personio, teamtailor, smartrecruiters, breezy]
   confirmed_domains: []

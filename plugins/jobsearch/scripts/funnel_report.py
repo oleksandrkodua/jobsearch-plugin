@@ -36,17 +36,44 @@ def _host(url):
         return ""
 
 
+NAME_SUFFIXES = ("hq", "jobs", "careers")  # "ashby" also matches the label "ashbyhq"
+
+
+def _entry_matches(entry, host):
+    """Config entry vs host. Entry with a dot = host: equal or a subdomain ("www."/"*." in the entry is ignored).
+    Entry without a dot = a name ("Happy Monday", "lever"): normalised (lowercase, no spaces . - _) it must equal
+    a whole host label, or a label that is the name plus "hq"/"jobs"/"careers". Never a bare substring,
+    and the last label (the TLD) is never used."""
+    if entry is None:
+        return False
+    e = str(entry).strip().lower()
+    if not e:
+        return False
+    if "." in e:
+        for pre in ("*.", "www."):
+            if e.startswith(pre):
+                e = e[len(pre):]
+        e = e.strip(".")
+        return bool(e) and (host == e or host.endswith("." + e))
+    n = re.sub(r"[\s.\-_]", "", e)
+    if not n:
+        return False
+    return any(l == n or (l.startswith(n) and l[len(n):] in NAME_SUFFIXES) for l in host.split(".")[:-1])
+
+
+def _listed(entries, host):
+    return any(_entry_matches(e, host) for e in (entries or []))
+
+
 def host_class(url, cfg):
     h = _host(url or "")
     if not h:
         return "other"
     p = cfg.get("portals", {})
-    if any(str(a).lower() in h for a in (p.get("employer_ats") or [])):
+    if _listed(p.get("employer_ats"), h):
         return "employer ATS"
-    for d in (p.get("job_portals") or []):
-        d = str(d).lower().lstrip(".")
-        if d and (h == d or h.endswith("." + d)):
-            return "job portal"
+    if _listed(p.get("job_portals"), h):
+        return "job portal"
     return "other"
 
 

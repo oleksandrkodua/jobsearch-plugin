@@ -96,6 +96,35 @@ class FunnelCase(unittest.TestCase):
         self.assertIn("no job portals configured", out)
         self.assertEqual(funnel_report.host_class("https://www.linkedin.com/x", cfg_of(portals__job_portals=[])), "other")
 
+    def test_portal_names_and_hosts(self):
+        cfg = cfg_of(portals__job_portals=["LinkedIn", "DOU", "Happy Monday", "*.djinni.co", "www.work.ua"],
+                     portals__employer_ats=["lever", "ashby", "smartrecruiters", "Team-Tailor", "jobs.example.org"])
+        hc = lambda u: funnel_report.host_class(u, cfg)
+        for u in ("https://www.linkedin.com/jobs/1", "https://jobs.dou.ua/x", "https://happymonday.ua/v",
+                  "https://djinni.co/jobs/1", "https://m.djinni.co/a", "https://WWW.Work.UA/x"):
+            self.assertEqual(hc(u), "job portal", u)
+        for u in ("https://jobs.lever.co/a/1", "https://jobs.ashbyhq.com/a", "https://jobs.smartrecruiters.com/a",
+                  "https://acme.teamtailor.com/jobs/1", "https://jobs.example.org/1", "https://careers.lever.co/x"):
+            self.assertEqual(hc(u), "employer ATS", u)
+
+    def test_name_match_is_label_not_substring(self):
+        cfg = cfg_of(portals__job_portals=["DOU"], portals__employer_ats=["lever", "jobs.example.org"])
+        for u in ("https://clever.example/a", "https://doudou.example/a", "https://notjobs.example.org/a",
+                  "https://leverage.example/a", "https://x.example.org/a"):
+            self.assertEqual(funnel_report.host_class(u, cfg), "other", u)
+
+    def test_empty_portal_lists_have_no_defaults(self):
+        cfg = cfg_of(portals__job_portals=[], portals__employer_ats=[])
+        for u in ("https://www.linkedin.com/x", "https://jobs.lever.co/x"):
+            self.assertEqual(funnel_report.host_class(u, cfg), "other")
+
+    def test_tld_never_name_matched_and_null_entries_skipped(self):
+        cfg = cfg_of(portals__job_portals=["co", "ua", None, "", "  "], portals__employer_ats=[None])
+        for u in ("https://x.co/a", "https://dou.ua/a", "https://none.example/a", "https://jobs.none/a"):
+            self.assertEqual(funnel_report.host_class(u, cfg), "other", u)
+        cfg = cfg_of(portals__job_portals=["DOU"])
+        self.assertEqual(funnel_report.host_class("https://dou.ua/a", cfg), "job portal")
+
     def test_tracker_unchanged(self):
         logp = os.path.join(self.dd, "tracker", "CHANGELOG.csv")
         before, log_before = read_bytes(self.tracker), read_bytes(logp)
