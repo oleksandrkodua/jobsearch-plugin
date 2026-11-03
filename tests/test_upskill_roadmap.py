@@ -55,5 +55,18 @@ class RoadmapDocs(unittest.TestCase):
         self.assertIn("## Not skill gaps", FACTS)
 
 
+class RoadmapRuleSentences(unittest.TestCase):
+    """Hard-rule sentences must stay whole: a weakened or split rule fails here."""
+
+    def test_rule_sentences_intact(self):
+        for s in (
+            'Message drafts only: never sent or posted (hard rule 1).',
+            'A roadmap is built only after the user picks path (c).',
+            'studying is not a claim, and planning a certification is not a claim either.',
+            'A skill or certificate becomes claimable only after the user states the evidence and adds it to the facts file.',
+            'No invented gap history, no invented resources.',
+        ):
+            self.assertIn(s, RM, s)
+
 if __name__ == "__main__":
     unittest.main()

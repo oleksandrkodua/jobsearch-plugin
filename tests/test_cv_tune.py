@@ -83,5 +83,27 @@ class TuneFixtureAudit(unittest.TestCase):
         self.assertIn("Kubernetes", warns[0])
 
 
+class TuneFormatRuleSentences(unittest.TestCase):
+    """Hard-rule sentences must stay whole: a weakened or split rule fails here."""
+
+    def test_rule_sentences_intact(self):
+        for s in (
+            '4. **Inputs are read-only.** The final CV files and the master CV are never written.',
+            '5. **Nothing is sent or uploaded.**',
+            '6. **Conflicts are asked, not resolved.** If the final CV and the master disagree on a date, title or employer, list the conflict and ask the user.',
+            'A block with `NOT IN SOURCES` is shown but marked not usable, and it never goes into `cv_tune_bullets.md` or `cv.md`.',
+        ):
+            self.assertIn(s, FMT, s)
+
+class TuneCommandRuleSentences(unittest.TestCase):
+    """Hard-rule sentences must stay whole: a weakened or split rule fails here."""
+
+    def test_rule_sentences_intact(self):
+        for s in (
+            'It is read-only (hard rule 6).',
+            'Never edit the files in `paths.cv_files` or the master CV. Nothing is sent or uploaded; say "not sent".',
+        ):
+            self.assertIn(s, TUNE, s)
+
 if __name__ == "__main__":
     unittest.main()
