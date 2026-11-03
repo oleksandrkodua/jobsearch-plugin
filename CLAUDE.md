@@ -22,7 +22,7 @@ Personal data (profile, tracker, applications, private config) lives in the user
 
 ## Rules
 - Hard rules of the engine: `plugins/jobsearch/reference/hard-rules.md`. They are not configurable. Never send or apply; facts only from the data dir; the tracker changes only through `tracker_edit.py`.
-- No personal values in this repo: no real names, employers, contacts, salary figures, vacancy ids or machine paths in any file or commit. Every personal value is a config key; fixtures use the synthetic persona (Jordan Example, Example Corp).
+- No personal values in this repo: no real names, employers, contacts, salary figures, vacancy ids or machine paths in any file or commit. Every personal value is a config key; fixtures use the synthetic persona (Jordan Example, Example Corp). Exception: the copyright holder's name in `LICENSE` is intentional (the owner's choice); keep it, and keep its `publish_gate.allow` entry in the private config.
 - Python 3.9+, stdlib only; the only exceptions are the optional PDF extras of the ats-screening scripts (PyMuPDF; pdfplumber + pypdf).
 - Engine text says "the user", never a person's name. Files in English.
 - Commit locally when asked; never push without the user's say-so, and run the publish gate before any push.
