@@ -148,5 +148,50 @@ class RobotsCase(unittest.TestCase):
         self.assertEqual(r.returncode, 2)  # argparse usage error, no network
 
 
+class OverviewCase(unittest.TestCase):
+    """At startup the user is shown what each command and skill does, built from their own descriptions."""
+
+    def names(self):
+        cmds = sorted(f[:-3] for f in os.listdir(os.path.join(PLUGIN, "commands")) if f.endswith(".md"))
+        skills = sorted(d for d in os.listdir(os.path.join(PLUGIN, "skills"))
+                        if os.path.isfile(os.path.join(PLUGIN, "skills", d, "SKILL.md")))
+        return cmds, skills
+
+    def test_capabilities_lists_every_command_and_skill_with_a_one_liner(self):
+        text = session_start.capabilities()
+        cmds, skills = self.names()
+        for c in cmds:
+            self.assertRegex(text, r"(?m)^- `/jobsearch:" + c + r"` - \S")
+        for k in skills:
+            self.assertRegex(text, r"(?m)^- `" + k + r"` - \S")
+        for line in text.splitlines():
+            self.assertLessEqual(len(line), 260, line)
+
+    def test_modes_are_named(self):
+        text = session_start.capabilities()
+        line = lambda c: next(l for l in text.splitlines() if l.startswith(f"- `/jobsearch:{c}`"))
+        self.assertIn("Modes: `tune`.", line("apply"))
+        self.assertIn("Modes: `roadmap`.", line("upskill"))
+        self.assertIn("Modes: `prep`, `debrief`, `redflags`.", line("interview"))
+        self.assertNotIn("Modes:", line("rank"))
+
+    def test_shown_on_startup_and_clear_not_on_resume_or_compact(self):
+        for source in ("startup", "clear", None):
+            ctx = session_start.context(FIXTURE, {}, source)["hookSpecificOutput"]["additionalContext"]
+            self.assertIn("===== jobsearch commands and skills =====", ctx, source)
+            self.assertIn("/jobsearch:apply", ctx)
+            self.assertIn("First give the user a short overview of the commands and skills", ctx)
+        for source in ("resume", "compact"):
+            ctx = session_start.context(FIXTURE, {}, source)["hookSpecificOutput"]["additionalContext"]
+            self.assertNotIn("===== jobsearch commands and skills =====", ctx, source)
+
+    def test_main_passes_source(self):
+        r = subprocess.run([sys.executable, "-B", HOOK], input=json.dumps({"cwd": FIXTURE, "source": "compact"}),
+                           capture_output=True, text=True,
+                           env={k: v for k, v in os.environ.items() if k != "JOBSEARCH_DATA_DIR"})
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertNotIn("commands and skills =====", r.stdout)
+
+
 if __name__ == "__main__":
     unittest.main()

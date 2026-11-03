@@ -39,6 +39,8 @@ For LinkedIn review, ask Claude to use `linkedin-profile-optimizer` with your su
 
 `hooks/hooks.json` registers `hooks/session_start.py` for startup, resume, clear and compact. The hook reads the files configured by `paths.start_file` and `paths.todo_file` and adds the overview plus unchecked TODO items to Claude's context. It does not modify files.
 
+On startup and clear (not on resume or compact) it also adds a list of every command and skill with a one-line description and its modes, taken from their own frontmatter, and asks Claude to show that overview to the user first, so a new user sees what the plugin can do. At most 30 open TODO items are shown, plus a count of the rest.
+
 It runs only when the current project is the resolved data folder or contains a `.jobsearch-data` marker. It stays silent in other projects, on data/config errors, and when the project's own Claude settings already define a SessionStart hook. A missing overview or TODO file is reported in the loaded context rather than breaking the session.
 
 ## Planned features
