@@ -1,6 +1,6 @@
 ---
 name: ats-screening
-description: ATS CV screening and job-match analysis with the rigor of a selective recruiter's first-pass screen. Use when the user shares a CV/resume and wants feedback, a score, "would this pass ATS", "review my resume", or asks how well a CV fits a job posting ("job match", "should I apply", "gap analysis vs this JD"), including a pasted CV with no explicit question, a CV plus a job description, URL or screenshot, and ATS/PDF technical checks (text layer, hidden text, parsing risk). Reads English, Russian and Ukrainian. Not for writing or rewriting a CV or letter (use cover-letter).
+description: ATS CV screening and job-match analysis with the rigor of a selective recruiter's first-pass screen. Use when the user shares a CV/resume and wants feedback, a score, "would this pass ATS", "review my resume", or asks how well a CV fits a job posting ("job match", "should I apply", "gap analysis vs this JD"), including a pasted CV with no explicit question, a CV plus a job description, URL or screenshot, and ATS/PDF technical checks (text layer, hidden text, parsing risk). Reads English, Russian and Ukrainian. Not for rewriting or tailoring a CV (use apply, mode `tune`) and not for writing a letter (use cover-letter).
 ---
 
 # ATS CV Screening & Job Match Analyzer
