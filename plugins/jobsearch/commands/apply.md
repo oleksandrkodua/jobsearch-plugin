@@ -1,6 +1,6 @@
 ---
 description: Prepare an application for one vacancy - letter draft, optional targeted CV copy, grounding audit. Drafter, then reviewer, then Grounding Audit. Never sends anything.
-argument-hint: <vacancy URL or pasted text> [company]
+argument-hint: <vacancy URL or pasted text> [company]   |   tune <vacancy URL or pasted text> [company]
 ---
 
 Read `${CLAUDE_PLUGIN_ROOT}/reference/hard-rules.md`, then the user's config (data dir; run `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/datadir.py" show` to print the data dir, the config path and the absolute `paths.*`) and the files named by `paths.facts` and `paths.master_cv`. Input: $ARGUMENTS
@@ -21,3 +21,17 @@ Gate 0: run the `/rank` steps first if no ranked file exists for this vacancy in
    `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/grounding_audit.py" <paths.applications>/<dir>/cv.md --kind cv`
    Every FAIL is fixed or sent to the user. Every WARN is resolved in writing in `audit.txt` (confirmed with the user, or removed). Then run the `grounding-audit` skill for the semantic part (dates, employers, metrics, tools against the facts file and master labels).
 8. **Hand-over.** Present files plus a checklist: audit result, ATS score, open questions, anything marked NOT IN SOURCES, what the user must fill (placeholders). Say clearly: "not sent". After the user says they applied, record it (valid statuses only; see `${CLAUDE_PLUGIN_ROOT}/reference/statuses.md`): `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/tracker_edit.py" set <id> status APPLIED --note "<applied, date>"` and `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/tracker_edit.py" set <id> applied_date <YYYY-MM-DD>` (no row yet: `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/tracker_edit.py" add --company "<company>" --position "<title>" --status APPLIED --url "<url>" --date <YYYY-MM-DD>`) and add a line to the application log in `paths.letter_kb`.
+
+## Mode `tune` (CV tailoring suggestions)
+`/apply tune <vacancy> [company]` gives ATS feedback and grounded rewrite suggestions for the CV against one vacancy. Steps 4-6 (letter) are not run. Report format and guardrails: `${CLAUDE_PLUGIN_ROOT}/reference/cv-tune-format.md`; follow it exactly.
+
+T1. **Gate 0 and folder** as in Gate 0 and step 1 above.
+T2. **Original lines.** Take the final CV from `paths.cv_files`; if there are several, ask which one. It is read-only (hard rule 6). If `paths.cv_files` is empty, use the master CV lines and say so in the report.
+T3. **Match.** Run the `ats-screening` skill, Stage 2, on that CV and the vacancy. Take the Requirement Match Matrix, ATS Keyword Alignment, Job Match and Candidate Quality from its output. Do not recompute them.
+T4. **Keywords.** For every required or preferred keyword that is weak or absent, look for evidence in `paths.master_cv` and `paths.facts`, and pick `surface`, `strengthen` or `do not add (no evidence)`. A `do not add` keyword that matches a gap-table row in `paths.facts` points to `/upskill`.
+T5. **Write** `cv_tune.md` in the format of the reference file. Write every Improved line and the proposed Summary and Skills text, one item per line, to `cv_tune_bullets.md`.
+T6. **Audit (blocks hand-over):**
+   `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/grounding_audit.py" <paths.applications>/<dir>/cv_tune_bullets.md --kind cv`
+   Then run the `grounding-audit` skill on the same file and record both results in `audit.txt`. Every FAIL line is either rewritten honestly or marked NOT IN SOURCES and removed from `cv_tune_bullets.md`; every WARN is resolved in writing in `audit.txt` as in step 7 (confirmed with the user, or the line removed). A report with an open FAIL is not handed over.
+T7. **Risk lines.** Give the `honesty.known_risk_lines` warning as in step 3, once per application.
+T8. **Targeted copy only when the user asks** after reading the report. Build `cv.md` as in step 3, from the master labels plus the accepted Improved lines, and audit it as in step 7. Job Match may be re-run on `cv.md`, labelled "projection on the tuned copy, not a guarantee". Never edit the files in `paths.cv_files` or the master CV. Nothing is sent or uploaded; say "not sent".

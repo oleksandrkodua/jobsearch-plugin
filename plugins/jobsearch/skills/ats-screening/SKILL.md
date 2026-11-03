@@ -175,7 +175,7 @@ One concise paragraph on why this score, in plain language. Note explicitly that
 
 ## STAGE 2 — Job-Specific Screening
 
-**Objective:** determine fit against one specific role. Still analysis-only — do not rewrite the CV or suggest adding keywords unless the user separately asks for CV optimization (which is out of scope for this skill; tell them it's a separate task if they ask).
+**Objective:** determine fit against one specific role. Still analysis-only — do not rewrite the CV or suggest adding keywords unless the user separately asks for CV optimization (which is out of scope for this skill; if they ask, tell them it's a separate task: `/apply tune`).
 
 ### Step 1 — Parse the job description
 

@@ -1,0 +1,2 @@
+- Built internal API services used by several teams, cutting response time by 30%.
+- Ran Kubernetes deployments for the API services.
