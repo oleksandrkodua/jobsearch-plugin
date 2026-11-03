@@ -24,7 +24,7 @@
     {
       "id": 5,
       "prompt": "In my LinkedIn About section, add that I improved regression coverage by 40% and cut release time by 25% at Example Corp. Use my jobsearch data dir.",
-      "expected_output": "40% is kept only if it is in honesty.allowed_numbers; 25% is marked NOT IN SOURCES, kept out of linkedin_draft.txt, and grounding_audit.py --kind cv would FAIL on it. No invented metric reaches the draft."
+      "expected_output": "40% is kept only if it is in honesty.allowed_numbers; 25% is marked NOT IN SOURCES, kept out of linkedin_draft_<YYYY-MM-DD>.txt, and grounding_audit.py --kind cv would FAIL on it. No invented metric reaches the draft."
     }
   ]
 }
