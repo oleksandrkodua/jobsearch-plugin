@@ -6,6 +6,7 @@ Silent (prints nothing, exit 0) in any other project, on any data-dir error, and
 own .claude/settings.json or settings.local.json already defines a SessionStart hook.
 On startup and clear (not on resume or compact) it also lists every command and skill with a one-line
 description taken from their own frontmatter, and asks Claude to show that overview to the user first.
+`session_start.py --list` prints only that overview (used by /jobsearch:help; needs no data dir).
 Read-only. Stdlib only. A missing file is reported in the text instead of failing.
 """
 import json
@@ -121,7 +122,11 @@ def context(project_root, env, source=None):
     }
 
 
-def main(stdin=None, env=None):
+def main(stdin=None, env=None, argv=None):
+    argv = sys.argv[1:] if argv is None else argv
+    if argv[:1] == ["--list"]:  # used by /jobsearch:help; needs no data dir
+        print(capabilities())
+        return 0
     try:
         env = os.environ if env is None else env
         try:

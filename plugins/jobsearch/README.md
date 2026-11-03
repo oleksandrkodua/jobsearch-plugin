@@ -6,7 +6,7 @@ A neutral job-search engine for any profession. It triages vacancies, drafts hon
 Point the plugin at your private data folder with `JOBSEARCH_DATA_DIR`. Put your settings in `jobsearch.config.yaml` inside it, or set `JOBSEARCH_CONFIG` to a config file kept elsewhere. Start from `reference/config.template.yaml` (or run `/jobsearch:jobsearch-setup`, which copies and validates it); to re-check a copy later, run the plugin's `scripts/datadir.py` with `validate PATH`. Layout and `paths.*` keys: `reference/data-contract.md`.
 
 ## Commands and skills
-The plugin has 8 commands (`/jobsearch:<name>`) and 6 skills. Most of the workflow lives in the commands; the skills are helpers used inside them or on request. Full tables: the "What's inside" section of the root `README.md`.
+The plugin has 9 commands (`/jobsearch:<name>`) and 6 skills. Most of the workflow lives in the commands; the skills are helpers used inside them or on request. Full tables: the "What's inside" section of the root `README.md`.
 
 Commands:
 - `commands/rank.md` - triage a vacancy: duplicate check, legitimacy, blockers, match %, verdict.
@@ -17,6 +17,7 @@ Commands:
 - `commands/upskill.md` - skill-gap heat map from rejections, with a learning plan; mode `roadmap` for a 12-month career map.
 - `commands/funnel.md` - funnel and patterns report from the tracker.
 - `commands/jobsearch-setup.md` - create the data folder skeleton.
+- `commands/help.md` - overview of all commands, modes and skills, the workflow and the setup status; works without a data folder.
 
 Skills:
 - `skills/ats-screening/` - ATS CV screening and job-match analysis.

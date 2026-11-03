@@ -7,6 +7,7 @@
 - `/rank` batch mode is capped at 10 vacancies per run; the rest is offered as the next batch.
 - SessionStart hook shows at most 30 open TODO items plus a count of the rest.
 - SessionStart overview: on startup and clear the hook lists every command and skill with a one-line description and its modes (built from their frontmatter) and asks Claude to show it to the user first.
+- `/jobsearch:help`: the same overview on demand, plus the usual workflow and the setup status; works in any project, also before a data folder exists. `session_start.py --list` prints the overview.
 
 ## 0.3.0 (2026-11-03)
 - `/apply tune`: ATS feedback and grounded CV rewrite suggestions for one vacancy (format and guardrails in `reference/cv-tune-format.md`); a targeted copy only on request; the final CV files are never edited.
