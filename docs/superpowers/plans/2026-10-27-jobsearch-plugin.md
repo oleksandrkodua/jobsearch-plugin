@@ -16,7 +16,7 @@
 - Run the executing session with this repo as its working directory (the sandbox lets Bash write only to the working dir and temp). The source workspace (`$JOBSEARCH_DATA_DIR` of the owner, called SRC below) is READ-ONLY: never write, edit, create a marker or config file there.
 - No personal value of the owner in any file or commit of this repo, including tests and docs. Fixtures use the synthetic persona only: `Jordan Example`, `jordan.example@example.com`, `+1 555 0100`, handle `@jordan_example`, employer `Example Corp`.
 - Owner's private config: `<private config path, outside the repo>` (Q3). Never copied into this repo; tests never read it (only Task 13 and the gate do).
-- Git: neutral committer identity for this repo (`git config user.name "jobsearch maintainers"`, `git config user.email "jobsearch@users.noreply.github.com"`). Commit messages end with `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`. Never push without the owner's go-ahead; push only after Task 14 PASS.
+- Git: neutral committer identity for this repo (`git config user.name "jobsearch maintainers"`, `git config user.email "maintainers@jobsearch-plugin.invalid"`; changed 2026-10-29: the earlier `jobsearch@users.noreply.github.com` belongs to an unrelated GitHub user "jobsearch", who then showed up as a contributor). Commit messages end with `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`. Never push without the owner's go-ahead; push only after Task 14 PASS.
 - Python: stdlib only (except optional PyMuPDF in the ATS PDF path); run tests with `PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -v`.
 - Files in English. Engine text says "the user", never a name.
 - Env vars: `JOBSEARCH_DATA_DIR`, `JOBSEARCH_CONFIG`. Marker file `.jobsearch-data`. Config file `jobsearch.config.yaml` (YAML subset) or `jobsearch.config.json`.
@@ -44,7 +44,7 @@
 **Interfaces:**
 - Produces: `python3 evals/validate_repo.py` -> prints `PASS|FAIL <check>` lines, exit 1 on any FAIL. Check function `check(name: str, ok: bool, detail: str = "")`. Later tasks add checks by appending blocks.
 
-- [x] **Step 1 (owner, Terminal):** `cd <plugin repo> && git init && git config user.name "jobsearch maintainers" && git config user.email "jobsearch@users.noreply.github.com"`. Expected: "Initialized empty Git repository".
+- [x] **Step 1 (owner, Terminal):** `cd <plugin repo> && git init && git config user.name "jobsearch maintainers" && git config user.email "maintainers@jobsearch-plugin.invalid"` (see Global Constraints, Git). Expected: "Initialized empty Git repository".
 - [x] **Step 2: Write failing test** `tests/test_validate_repo.py::test_validator_passes_on_repo` - runs the validator as subprocess, asserts exit code 0 and no line starts with `FAIL`.
 - [x] **Step 3:** run it; expected FAIL (validator missing).
 - [x] **Step 4: Create** `evals/validate_repo.py` by adapting a reference validator from another repo: keep checks 1 (CLAUDE.md < 100 lines), 2 (JSON valid), 3/3b/3c (frontmatter, name = folder, description < 1100 chars and says when NOT to use, documented keys, `evals/evals.json` or `STATUS: SKELETON`) pointed at `plugins/jobsearch/skills/*/`, 6 (README relative paths exist), 7 (secret-looking strings). Drop 3e, 4, 5, 8-11. Add: 12 every `scripts/<name>.py` mentioned in `plugins/jobsearch/commands/*.md` and skills exists. `.gitignore`: `__pycache__/`, `*.pyc`, `.DS_Store`, `tracker/`, `applications/`, `profile/`, `*.config.yaml` except `plugins/jobsearch/reference/config.template.yaml` and `evals/fixtures/**`.

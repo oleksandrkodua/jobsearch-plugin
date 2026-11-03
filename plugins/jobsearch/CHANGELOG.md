@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.3.0 (unreleased)
+## 0.3.0 (2026-11-03)
 - `/apply tune`: ATS feedback and grounded CV rewrite suggestions for one vacancy (format and guardrails in `reference/cv-tune-format.md`); a targeted copy only on request; the final CV files are never edited.
 - `/upskill roadmap`: 12-month career map built on the gap table, with monthly goals, sourced certifications and networking drafts; no new config keys.
 - `linkedin-profile-optimizer`: data-dir mode (conflicts first, every line traced to the master CV or facts, `grounding_audit.py --kind cv` on the draft).
