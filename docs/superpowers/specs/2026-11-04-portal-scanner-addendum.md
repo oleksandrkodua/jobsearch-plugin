@@ -1,6 +1,6 @@
 # Addendum A1: portal scanner (`/jobsearch:scan`)
 
-Status: APPROVED by the owner 2026-11-04. Q1-Q3 (§11) answered 2026-11-04; the plan can be written.
+Status: APPROVED by the owner 2026-11-04. Q1-Q3 (§11) answered 2026-11-04; the plan can be written. Ships in 1.0.0 (owner decision 2026-11-04), with `alt_flow.scanner.enabled: false` by default.
 Parent spec: `2026-10-27-jobsearch-plugin-design.md` §6.7 A1 (copied in `docs/alternative-flow.md`). This addendum details A1 and does not weaken any hard rule in `plugins/jobsearch/reference/hard-rules.md`.
 
 ## 1. Intent

@@ -88,7 +88,7 @@ In the data-folder project, the SessionStart hook checks for missing onboarding 
 - **§6.6 (Setup):** points to this addendum.
 
 ## 11. Release (Q20)
-**1.0.0, the first public release** (owner decision 2026-11-04). It ships after all open edits are done: this onboarding, the general tune, the help and session-start updates and the bilingual rules, together with the already merged `/rank` location filter. No 0.5.0 in between; the CHANGELOG section `0.5.0 (unreleased)` becomes `1.0.0`.
+**1.0.0, the first public release** (owner decision 2026-11-04). It ships after all open edits are done: this onboarding, the general tune, the help and session-start updates and the bilingual rules, together with the already merged `/rank` location filter, the egress guard (`2026-11-04-egress-guard-addendum.md`) and the portal scanner A1 (`2026-11-04-portal-scanner-addendum.md`, off by default). No 0.5.0 in between; the CHANGELOG section `0.5.0 (unreleased)` becomes `1.0.0`.
 
 ## 12. Verification (Q17)
 - **Doc tests:**
