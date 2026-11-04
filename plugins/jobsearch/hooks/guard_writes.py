@@ -179,7 +179,7 @@ def decide(tool_name, tool_input, cwd, env):
             result = file_decision(tool_name, p, cwd, entries)
             if result:
                 local.append(result)
-        elif tool_name == "Bash":
+        elif tool_name == "Bash" and (entries or egress.configured(cwd, env)):
             local = bash_file_decisions(tool_input.get("command", ""), cwd, entries)
         elif mcp_write:
             for key in ("path", "file_path", "notebook_path", "source", "source_path", "destination", "destination_path"):

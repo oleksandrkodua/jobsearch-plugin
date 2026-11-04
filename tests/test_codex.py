@@ -116,6 +116,15 @@ class CodexPackage(unittest.TestCase):
         r = self.run_script("hooks/codex_guard.py", data=event)
         self.assertEqual((r.returncode, r.stdout), (0, ""), r.stderr)
 
+    def test_unconfigured_heredoc_with_apostrophe_is_not_blocked(self):
+        with tempfile.TemporaryDirectory() as other:
+            command = "cat > spec.md <<EOF\nIt" + chr(39) + "s a specification.\nEOF"
+            event = {"cwd": other, "tool_name": "Bash", "tool_input": {"command": command}}
+            result = self.run_script("hooks/codex_guard.py", data=event, configured=False)
+            self.assertEqual((result.returncode, result.stdout), (0, ""), result.stderr)
+            result = self.run_script("hooks/codex_guard.py", data=event, configured=True)
+            self.assertEqual(json.loads(result.stdout)["hookSpecificOutput"]["permissionDecision"], "deny")
+
     def test_patch_move_target_checked_and_full_batch_denied(self):
         event = {"cwd": str(FIXTURE), "tool_name": "apply_patch", "tool_input": {"command":
             "*** Begin Patch\n*** Update File: applications/draft.md\n*** Move to: tracker/vacancies.csv\n@@\n-x\n+y\n*** End Patch"}}
