@@ -43,7 +43,7 @@ DEFAULTS = {
     "blockers": [],
     "match_weights": {"must_have": 60, "nice_to_have": 10, "seniority": 10, "domain": 10, "format_salary": 10},
     "thresholds": {"apply": 80, "decline": 65},
-    "portals": {"job_portals": [], "confirmed_domains": [], "scan_approved": [],
+    "portals": {"job_portals": ["djinni.co", "dou.ua", "indeed.com", "stepstone.de"], "confirmed_domains": [], "scan_approved": [],
                 "employer_ats": ["greenhouse", "lever", "workable", "ashby", "recruitee", "personio",
                                  "teamtailor", "smartrecruiters", "breezy"]},
     "honesty": {

@@ -90,6 +90,8 @@ Never send or apply, facts only from the data folder, the tracker changes only t
 
 ## Opt-in alternative flow
 
+Default job portals are Djinni (`djinni.co`), DOU (`dou.ua`), Indeed (`indeed.com`) and Stepstone (`stepstone.de`). New setups include them; existing configurations keep their own lists. Each domain still requires user confirmation before fetching. These entries classify vacancy links; they do not enable automatic scanning.
+
 The portal scanner (`/jobsearch:scan`, Greenhouse and Lever) is shipped and off by default. An application-form assistant and email reply-watch are planned later phases, not shipped features. Their opt-in design and approval gates are documented in `docs/alternative-flow.md`.
 
 ## Tests and validator
