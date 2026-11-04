@@ -25,6 +25,7 @@ paths:                  # relative to the data folder
   start_file: START_HERE.md
   todo_file: TODO.md
   study_library: []     # read-only folders for /upskill and /interview
+  scan_state: reports/scan_state.json   # seen ids of /jobsearch:scan
 
 tracker: {id_prefix: "VAC-", decided_by_label: "DECIDED_BY_USER", statuses: default}
 
@@ -52,6 +53,9 @@ portals:
   job_portals: []
   employer_ats: [greenhouse, lever, workable, ashby, recruitee, personio, teamtailor, smartrecruiters, breezy]
   confirmed_domains: []
+  scan_approved: []     # /jobsearch:scan sources, added only by its approve step:
+                        #   {source: "greenhouse:<board>" | "lever:<company>", host: "", robots: ALLOWED,
+                        #    tos_checked: "YYYY-MM-DD", approved_by_user: "YYYY-MM-DD"}
 
 honesty:
   never_claim: []           # items: {pattern: "regex", why: ""}; a match FAILs the grounding audit
@@ -80,7 +84,7 @@ followup: {default_days: 10, window_days: [3, 7], max_followups: 2}
 interview: {redflag_checks: []}
 
 alt_flow:               # all off by default
-  scanner: {enabled: false}
+  scanner: {enabled: false, delay_seconds: 5, max_requests_per_run: 30}   # /jobsearch:scan, on demand only
   apply_assistant: {enabled: false}
   reply_watch: {enabled: false}
 

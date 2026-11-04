@@ -1,0 +1,7 @@
+{"jobs": [
+  {"id": 1001, "title": "Senior QA Engineer", "location": {"name": "Kyiv, Ukraine"}, "absolute_url": "https://boards.greenhouse.io/examplecorp/jobs/1001", "updated_at": "2026-11-01T10:00:00-04:00"},
+  {"id": 1002, "title": "QA Engineer (m/f/d)", "location": {"name": "Remote"}, "absolute_url": "https://boards.greenhouse.io/examplecorp/jobs/1002", "updated_at": "2026-11-02T10:00:00-04:00"},
+  {"id": 1003, "title": "Senior QA Engineer", "location": {"name": "Berlin, Germany (Hybrid)"}, "absolute_url": "https://boards.greenhouse.io/examplecorp/jobs/1003", "updated_at": "2026-11-03T10:00:00-04:00"},
+  {"id": 1004, "title": "Sales Manager", "location": {"name": "London"}, "absolute_url": "https://boards.greenhouse.io/examplecorp/jobs/1004", "updated_at": "2026-11-03T10:00:00-04:00"},
+  {"id": 1005, "title": "", "location": {"name": "Remote"}, "absolute_url": "https://boards.greenhouse.io/examplecorp/jobs/1005", "updated_at": ""}
+]}

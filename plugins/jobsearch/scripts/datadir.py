@@ -32,6 +32,7 @@ DEFAULTS = {
         "letter_kb": "cover_letters/", "tracker": "tracker/vacancies.csv", "applications": "applications/",
         "ranked": "vacancies/ranked/", "story_bank": "interview/story_bank.md", "reports": "reports/",
         "start_file": "START_HERE.md", "todo_file": "TODO.md", "study_library": [],
+        "scan_state": "reports/scan_state.json",
     },
     "tracker": {"id_prefix": "VAC-", "decided_by_label": "DECIDED_BY_USER", "statuses": "default"},
     "targets": {"roles": [], "roles_selective": [], "roles_not_primary": [], "domains_priority": [], "formats": [],
@@ -39,7 +40,7 @@ DEFAULTS = {
     "blockers": [],
     "match_weights": {"must_have": 60, "nice_to_have": 10, "seniority": 10, "domain": 10, "format_salary": 10},
     "thresholds": {"apply": 80, "decline": 65},
-    "portals": {"job_portals": [], "confirmed_domains": [],
+    "portals": {"job_portals": [], "confirmed_domains": [], "scan_approved": [],
                 "employer_ats": ["greenhouse", "lever", "workable", "ashby", "recruitee", "personio",
                                  "teamtailor", "smartrecruiters", "breezy"]},
     "honesty": {
@@ -51,7 +52,7 @@ DEFAULTS = {
                 "forbidden_buzzwords": [], "no_long_dash": True, "signature_lines": [], "base_letters": []},
     "followup": {"default_days": 10, "window_days": [3, 7], "max_followups": 2},
     "interview": {"redflag_checks": []},
-    "alt_flow": {"scanner": {"enabled": False}, "apply_assistant": {"enabled": False}, "reply_watch": {"enabled": False}},
+    "alt_flow": {"scanner": {"enabled": False, "delay_seconds": 5, "max_requests_per_run": 30}, "apply_assistant": {"enabled": False}, "reply_watch": {"enabled": False}},
     "publish_gate": {"allow": []},
 }
 
@@ -280,6 +281,25 @@ def bad_choices(user):
     return out
 
 
+SCAN_SOURCE_RE = re.compile(r"^(greenhouse|lever):([a-z0-9][a-z0-9-]*)$")  # A1: first-version source types
+_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+def scan_entry_problems(entry):
+    """Why a portals.scan_approved entry is not usable (empty list = usable)."""
+    if not isinstance(entry, dict):
+        return ["not a mapping"]
+    out = []
+    if not SCAN_SOURCE_RE.match(str(entry.get("source") or "")):
+        out.append("source must be greenhouse:<board> or lever:<company>")
+    if entry.get("robots") != "ALLOWED":
+        out.append("robots must be ALLOWED (run the approve step)")
+    for k in ("tos_checked", "approved_by_user"):
+        if not _DATE.match(str(entry.get(k) or "")):
+            out.append(f"{k} must be a date YYYY-MM-DD")
+    return out
+
+
 def unknown_keys(user, schema, prefix=""):
     """Dotted paths of mapping keys absent from the schema. Lists and free-form values are not checked."""
     bad = []
@@ -331,6 +351,9 @@ def main(argv, env=None, cwd=None):
         print("unknown config keys: " + ", ".join(bad))
         return 1
     bad = bad_choices(user or {})
+    scan = ((user or {}).get("portals") or {}).get("scan_approved") if isinstance((user or {}).get("portals"), dict) else None
+    for i, e in enumerate(scan or []):
+        bad += [f"portals.scan_approved[{i}]: {p}" for p in scan_entry_problems(e)]
     if bad:
         print("invalid config values: " + "; ".join(bad))
         return 1

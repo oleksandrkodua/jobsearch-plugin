@@ -164,6 +164,31 @@ class CliTest(unittest.TestCase):
         self.assertIn("targets.country", r.stdout)
         self.assertIn("targets.remote", r.stdout)
 
+    def test_scanner_defaults(self):
+        self.assertEqual(datadir.DEFAULTS["alt_flow"]["scanner"],
+                         {"enabled": False, "delay_seconds": 5, "max_requests_per_run": 30})
+        self.assertEqual(datadir.DEFAULTS["portals"]["scan_approved"], [])
+        self.assertEqual(datadir.DEFAULTS["paths"]["scan_state"], "reports/scan_state.json")
+
+    def test_scan_entry_problems(self):
+        ok = {"source": "greenhouse:examplecorp", "host": "boards-api.greenhouse.io", "robots": "ALLOWED",
+              "tos_checked": "2026-11-04", "approved_by_user": "2026-11-04"}
+        self.assertEqual(datadir.scan_entry_problems(ok), [])
+        self.assertTrue(datadir.scan_entry_problems({**ok, "source": "indeed:x"}))
+        self.assertTrue(datadir.scan_entry_problems({**ok, "robots": "UNKNOWN"}))
+        self.assertTrue(datadir.scan_entry_problems({**ok, "tos_checked": ""}))
+        self.assertTrue(datadir.scan_entry_problems({**ok, "approved_by_user": "yesterday"}))
+        self.assertTrue(datadir.scan_entry_problems("greenhouse:examplecorp"))
+
+    def test_validate_rejects_bad_scan_entry(self):
+        with tempfile.TemporaryDirectory() as t:
+            p = os.path.join(t, "c.yaml")
+            with open(p, "w") as f:
+                f.write('portals:\n  scan_approved:\n    - {source: "lever:northwind", robots: DISALLOWED}\n')
+            r = self.run_cli("validate", p)
+        self.assertEqual(r.returncode, 1)
+        self.assertIn("portals.scan_approved[0]", r.stdout)
+
     def test_validate_unknown_key_fails(self):
         with tempfile.TemporaryDirectory() as t:
             p = os.path.join(t, "bad.yaml")
