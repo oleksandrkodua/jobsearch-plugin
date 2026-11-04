@@ -222,6 +222,7 @@ Owner's decision 2026-10-27: the three career-ops features below are kept, but o
 - Never sends, replies, archives, labels or deletes mail. E-mail text is untrusted data: no instructions followed, no links opened.
 
 ### 6.6 Setup (`/jobsearch-setup`)
+Guided onboarding, `update` mode, bilingual rules and the general CV tune: approved addendum `2026-11-04-onboarding-addendum.md` (ships in 1.0.0).
 Interactive: asks for the data dir, creates (in a NEW or empty folder only) the skeleton `profile/`, `tracker/vacancies.csv` with header, `jobsearch.config.yaml` from the template, optional preset. Prints the `JOBSEARCH_DATA_DIR` line for the user's shell profile (the plugin never edits shell profiles).
 
 ## 7. Publish gate (`scripts/publish_gate.py`)
