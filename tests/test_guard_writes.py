@@ -91,14 +91,14 @@ class BashTool(GuardCase):
     def test_reading_protected_file_allowed(self):
         self.assertIsNone(self.decide("Bash", {"command": f"cat {self.path('tracker/vacancies.csv')}"}))
 
-    def test_writing_protected_file_asks(self):
+    def test_direct_tracker_and_readonly_writes_denied(self):
         for cmd in (f"sed -i '' 's/a/b/' {self.path('tracker/vacancies.csv')}",
                     f"echo x >> {self.path('profile/master_cv/MASTER_CONTENT.md')}",
                     "cp new.pdf cv/final_cv.pdf",
                     "rm tracker/vacancies.csv"):
-            decision, reason = self.decide("Bash", {"command": cmd})
-            self.assertEqual(decision, "ask", cmd)
-            self.assertIn("protected", reason)
+            decision, reason = self.decide("Bash", {"command": cmd}, cwd=self.dd)
+            self.assertEqual(decision, "deny", cmd)
+            self.assertTrue(reason)
 
     def test_stderr_redirects_are_not_writes(self):
         for cmd in (f"grep x {self.path('tracker/vacancies.csv')} 2>/dev/null",
@@ -113,7 +113,7 @@ class OutreachTools(GuardCase):
     def in_project(self, tool, tool_input):
         return guard_writes.decide(tool, tool_input, self.dd, self.env)  # project root = the data dir
 
-    def test_clicks_types_and_sends_ask_in_the_data_project(self):
+    def test_clicks_types_and_sends_deny_in_the_data_project(self):
         for tool, ti in (("mcp__claude-in-chrome__computer", {"action": "left_click", "coordinate": [1, 2]}),
                          ("mcp__Claude_Browser__computer", {"action": "type", "text": "x"}),
                          ("mcp__plugin_playwright_playwright__browser_click", {"element": "Apply"}),
@@ -123,8 +123,11 @@ class OutreachTools(GuardCase):
                          ("mcp__computer-use__app_click", {}),
                          ("mcp__gmail__send_message", {"to": "a@example.com"}),
                          ("mcp__slack__reply", {})):
+            if "gmail" in tool or "slack" in tool:
+                self.assertEqual(self.in_project(tool, ti)[0], "deny")
+                continue
             decision, reason = self.in_project(tool, ti) or (None, "")
-            self.assertEqual(decision, "ask", tool)
+            self.assertEqual(decision, "deny", tool)
             self.assertIn("never send, apply or submit", reason)
 
     def test_reading_and_navigation_allowed(self):
@@ -136,14 +139,14 @@ class OutreachTools(GuardCase):
             self.assertIsNone(self.in_project(tool, ti), tool)
 
     def test_other_projects_are_not_affected(self):
-        decision = guard_writes.decide("mcp__plugin_playwright_playwright__browser_click", {}, self.proj, self.env)
+        decision = guard_writes.decide("mcp__plugin_playwright_playwright__browser_click", {}, self.proj, {})
         self.assertIsNone(decision)
 
     def test_marker_project_counts_as_the_data_project(self):
         with open(os.path.join(self.proj, ".jobsearch-data"), "w", encoding="utf-8") as f:
             f.write(self.dd)
         decision = guard_writes.decide("mcp__claude-in-chrome__computer", {"action": "left_click"}, self.proj, {})
-        self.assertEqual(decision[0], "ask")
+        self.assertEqual(decision[0], "deny")
 
 
 class HookProcess(GuardCase):
@@ -172,7 +175,7 @@ class HookProcess(GuardCase):
         with open(os.path.join(PLUGIN, "hooks", "hooks.json"), encoding="utf-8") as f:
             pre = json.load(f)["hooks"]["PreToolUse"]
         self.assertEqual(len(pre), 2)
-        self.assertEqual(set(pre[0]["matcher"].split("|")), {"Write", "Edit", "MultiEdit", "NotebookEdit", "Bash"})
+        self.assertEqual(set(pre[0]["matcher"].split("|")), {"Write", "Edit", "MultiEdit", "NotebookEdit", "Bash", "WebSearch", "WebFetch", "Artifact"})
         self.assertEqual(pre[1]["matcher"], "mcp__.*")
         for entry in pre:
             self.assertEqual(entry["hooks"][0]["command"], 'python3 "${CLAUDE_PLUGIN_ROOT}/hooks/guard_writes.py"')

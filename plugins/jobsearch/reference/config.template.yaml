@@ -8,9 +8,18 @@ identity:               # used by letters and the publish gate; never printed in
   emails: []
   phones: []            # every known variant, including old ones
   handles: []           # messenger handles etc.
+  links: []             # {label: "Portfolio", url: "https://..."}; empty = not answered
+                        # Explicit "none" is recorded as <!-- jobsearch:links-none --> in the facts file.
   extra_private_terms: []   # employer names, project names, anything the gate must not find
 
 language: {chat: "", files: "en"}
+
+privacy:
+  approved_destinations: []  # only setup update, after two separate confirmations:
+                            # {type: git_private_repo, remote: "github.com/<owner>/<repo>"}
+                            # {type: mcp_tool, tool: "mcp__<server>__<tool>"}
+                            # {type: host, host: "<host>"}
+                            # Never overrides final-send denial or classifies unknown/generic tools.
 
 paths:                  # relative to the data folder
   facts: profile/facts.md

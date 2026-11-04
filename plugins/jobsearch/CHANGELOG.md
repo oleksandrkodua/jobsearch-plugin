@@ -1,6 +1,14 @@
 # Changelog
 
-## 0.5.0 (unreleased)
+## 1.0.0 (unreleased)
+- Pre-release architecture audit: fixed YAML description/argument-hint scalars and portable Codex helper metadata; added independent format checks.
+- Closed reproduced guard gaps: network option variants/recipients, git push URL rewrites, explicit connector HTTP actions, protected directory removal and download targets, dangling CV symlinks, and native workdir scope changes. Direct tracker/final CV writes through supported Bash/MCP paths now deny, while copy-out stays allowed.
+- Setup readiness includes identity and chat language; new setup binds its config explicitly; ATS helper honors English-CV/privacy rules and reports unavailable technical scores honestly. Scanner role matching retains short tokens such as QA. Codex build rejects recursive output locations.
+- Confirmed conservative policies in both clients: final send/reply/apply/submit tools always deny, including granted tools; browser/computer submission-capable interactions deny in the job-search project. Unknown/generic connectors deny before grants or read/GET hints; classified read inputs are checked for identity values. Drafts and separately approved non-message writes remain available. Live client checks remain unverified; see docs/audit-2026-11-04.md.
+- Guided onboarding and update: Ukrainian/English chat, English CV/master, confirmed facts/metrics, audited EN/UA base letters and approved links; create-only CV/master writes, missing-step status/reminders and general tune without a vacancy.
+- Egress guard: shared identity patterns (including links) for search/fetch; exact destination grants for outbound writes; fresh chat confirmation plus runtime ask; check errors deny configured outbound/protected writes.
+- Codex local edition built from the same workflow sources: commands become skills, helpers/startup/errors show host-specific names, native patch paths are checked; unsupported ask becomes deny/manual execution. Hosted web calls require an explicit local preflight and are not automatically intercepted.
+- Build/install and behavior per host are documented separately; no automatic install or public-directory submission.
 - `/rank` location filter: country (`any` | `ukraine` | `not_ukraine`) and remote (`any` | `yes` | `no`), defaults in `targets.country` / `targets.remote`, overridden per run with `--country` / `--remote`. Classified from the vacancy text only; Unknown is never filtered out; filtered vacancies stay in the batch table as FILTERED (country) / FILTERED (remote). `datadir.py validate` rejects other values.
 - `/jobsearch:scan` (addendum A1): on-demand scan of approved Greenhouse and Lever boards, off by default; robots re-checked every run, 5 s between requests, at most 30 per run; filtered postings always listed; candidates go to `/rank`; `approve` adds a source after two confirmations with a config backup.
 

@@ -22,7 +22,7 @@ A letter for a specific vacancy, an adaptation of an existing letter, answers to
 ## Order of work
 1. **Check the input.** If only a link or a title is given with no description, ask for the full text. Do not guess.
 2. **Parse the vacancy.** Title, domain, must-have vs nice-to-have, red flags, location requirements.
-3. **Pick the base letter** from the keys in `letters.base_letters`. If the vacancy domain matches none, use the first key marked as general, or ask the user. If the list is empty, say "no base letters configured" and write from the CV and facts alone.
+3. **Pick the base letter** from the keys in `letters.base_letters`. Use `base_en` for an English letter or `base_uk` for Ukrainian (entries may be `{key, path}` relative to `paths.letter_kb`); retain support for legacy domain keys. If the vacancy domain matches none, use the first key marked as general, or ask the user. If the list is empty, say "no base letters configured" and write from the CV and facts alone.
 4. **Match against facts.** Strong matches and gaps separately. A gap is either addressed honestly or not mentioned. Never filled with invention.
 5. **Write for this vacancy.** Use base letters for relevant experience and suitable tone, not a fixed rhetorical structure. Do not copy passages, aphoristic hooks, personal reactions or closing questions mechanically across a batch.
 6. **Self-check** against the checklist below.
@@ -45,7 +45,7 @@ A letter for a specific vacancy, an adaptation of an existing letter, answers to
 - Salutation: `letters.salutation`; if empty, address the hiring team or the named contact. Put the company name on the addressee line at the top.
 - Sign-off lines from `letters.signature_lines`; if empty, a plain closing and the user's name from `identity`.
 - If `letters.no_long_dash` is true, use no long dash anywhere; a short hyphen with spaces only.
-- The letter language equals the vacancy language. If correspondence with the recruiter was in another language, ask before writing.
+- The letter language equals the vacancy language when English or Ukrainian. For any other vacancy language, ask the user to choose English or Ukrainian and suggest English. If correspondence with the recruiter was in another language, ask before writing. Conversation uses `language.chat` (uk/en); CV text is always English. Only include links the user approved in `identity.links`; do not open them.
 - Vary openings and the way gaps are admitted inside one batch, so the letters do not read as a template.
 
 ## Natural, grounded writing

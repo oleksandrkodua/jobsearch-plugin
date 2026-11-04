@@ -1,6 +1,6 @@
 ---
 description: Funnel and patterns report from the tracker - stages, reply rate by host class and role type, rejection reasons by gap tag, median days to first reply. Read-only.
-argument-hint: (no arguments)
+argument-hint: "(no arguments)"
 ---
 
 Run the report (it reads the tracker and CHANGELOG.csv from the data dir; `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/datadir.py" show` prints where they are):

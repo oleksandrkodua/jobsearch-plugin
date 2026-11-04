@@ -1,20 +1,44 @@
 ---
-description: Create a new jobsearch data folder (profile/, tracker header, config from the template, optional QA preset). Refuses any folder that is not new or empty.
-argument-hint: (asks for the folder)
+description: "Guided setup of a new jobsearch data folder: language, targets, limits, English CV, identity, facts, master CV, metrics, ATS read, base letters and links. Mode `update`: review an existing folder and change only selected answers, with confirmation. Not for sending applications or silently replacing files."
+argument-hint: "[update]"
 ---
 
-Interactive setup. Never guess a folder and never touch an existing data folder.
+Read `${CLAUDE_PLUGIN_ROOT}/reference/hard-rules.md`. Input: $ARGUMENTS. This is an interactive wizard: ask one small group of related questions at a time, save confirmed answers, list skipped steps at the end. No fetches, uploads, applications or shell-profile edits. Missing facts are NOT IN SOURCES.
 
-1. Ask the user where the data folder should be (an absolute path). Ask whether to use a preset: `none` (default) or `qa` (`${CLAUDE_PLUGIN_ROOT}/presets/qa/`).
-2. Check the folder. It must not exist, or exist and be completely empty (`ls -A` prints nothing). If it has any content, stop and say so: setup never writes into an existing data folder; ask for another path.
-3. Create the skeleton:
-   - `mkdir -p "$DIR/profile" "$DIR/tracker"`
-   - `$DIR/tracker/vacancies.csv` with only this header line:
-     `id,company,position,url,status,status_confidence,proposed_status,needs_review,review_reason,applied_date,match_pct,domain,format_location,salary_notes,stage_xlsx,notes_xlsx,notes_csv,about_company,ask_comment,company_cell_extra,possible_duplicate_of,status_xlsx_raw,status_csv_raw,decision,override,sources`
-   - `$DIR/jobsearch.config.yaml`: copy `${CLAUDE_PLUGIN_ROOT}/reference/config.template.yaml`, or for the `qa` preset copy `${CLAUDE_PLUGIN_ROOT}/presets/qa/preset.yaml`; with the preset also copy `${CLAUDE_PLUGIN_ROOT}/presets/qa/facts.example.md` to `$DIR/profile/facts.md`.
-4. Validate the copy: `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/datadir.py" validate "$DIR/jobsearch.config.yaml"` and report the result.
-5. Print this line for the user to add to their own shell profile, and tell them to restart the shell or run it once:
-   `export JOBSEARCH_DATA_DIR="<the folder>"`
-6. Next steps for the user: fill `identity`, `targets` and `profile/facts.md`; personal values live only in that folder.
+## Folder and mode
 
-Rules that never bend: never edit a shell profile (`.zshrc`, `.bashrc`, etc.) or any other file outside the new folder; never overwrite or merge into an existing folder; never put personal values into the plugin repository.
+- New setup: ask for an absolute data-folder path and optional preset `none` (default) or `qa` (`${CLAUDE_PLUGIN_ROOT}/presets/qa/`). Never guess a folder. It must not exist, or be completely empty (including hidden files). If not empty, offer `update` or another path; do not merge a skeleton into it.
+- Create the skeleton in that new/empty folder only: `profile/`, `tracker/`, `cover_letters/`, `applications/`, `vacancies/ranked/`, `interview/`, `reports/`; copy `${CLAUDE_PLUGIN_ROOT}/reference/config.template.yaml` (or the preset config) to `jobsearch.config.yaml`. A preset's example facts go to `profile/facts.example.md`, never to the real facts file; examples are not the user's experience.
+- Create `tracker/vacancies.csv` with only this header:
+  `id,company,position,url,status,status_confidence,proposed_status,needs_review,review_reason,applied_date,match_pct,domain,format_location,salary_notes,stage_xlsx,notes_xlsx,notes_csv,about_company,ask_comment,company_cell_extra,possible_duplicate_of,status_xlsx_raw,status_csv_raw,decision,override,sources`
+- Validate: `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/datadir.py" validate "<data-folder>/jobsearch.config.yaml"`. Print `export JOBSEARCH_DATA_DIR="<data-folder>"` for the user to run themselves. Never edit `.zshrc`, `.bashrc` or any shell profile. Resolve a supplied folder explicitly for subsequent commands; do not assume the printed export changed this session.
+- `update` on an existing folder: run `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/datadir.py" show` and `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/onboarding.py" status`. Show the current answers and missing steps, ask which to change, and run only those steps. Selective and not-primary roles and a second CV may be added here. Never rerun the skeleton or rewrite the tracker.
+- Before EVERY save show the exact proposed text/diff and get confirmation. An overwrite/removal requires two separate confirmations in chat, a uniquely named backup alongside the original, and re-reading the saved result. Do not change unrelated answers. Validate config after every config save. Never put personal values in the plugin repository.
+
+For NEW setup, bind BOTH `JOBSEARCH_DATA_DIR` and `JOBSEARCH_CONFIG` to the new folder and its new config in every subsequent subprocess. Do not inherit an existing `JOBSEARCH_CONFIG` pointing at another private config. Print both export lines for the user: `JOBSEARCH_DATA_DIR` and `JOBSEARCH_CONFIG`. In `update`, retain the already resolved config path instead. Show the two resolved paths before saving anything.
+
+## Guided onboarding (in this order, each step skippable)
+
+1. **Language.** Infer Ukrainian or English from the first message and confirm `language.chat` (`uk` or `en`; empty means ask). Ask which base-letter languages the user wants: EN, UA or both. All commands and skills use that confirmed chat language. Engine files remain English.
+2. **Targets.** Ask primary roles once (`targets.roles`), country (`targets.country`: `any`, `ukraine`, `not_ukraine`) and remote (`targets.remote`: `any`, `yes`, `no`). Both location defaults are `any`. Ask selective/not-primary roles only in `update` when requested.
+3. **Optional limits.** Offer to skip. Capture salary minimum with currency and net/gross, schedule end with timezone and hard no's as typed `blockers`; never guess tax conversion or the salary number. With none, `/rank` says "no blockers configured".
+4. **English CV.** Accept one PDF or pasted English text. For DOCX ask the user to export PDF; do not install a new converter. If the CV is not English, ask for an English version and skip this step until supplied; do not translate it. Show the destination, register it in `paths.cv_files`, then store the upload verbatim with create-only confirmation. A text CV may be saved as `.txt`. Never overwrite an existing final CV; additional versions use new names in `update`. These files are read-only after creation.
+5. **Identity.** Extract name, emails, phones and handles from the supplied CV; show and confirm each value before saving `identity.*`. Ask about ambiguous contacts. Check that `publish_gate.build_patterns` now yields identity patterns; do not run the publish gate on the data folder or print private patterns into reports. If identity was skipped, explicitly report that identity-based search protection is incomplete.
+6. **Facts and master CV.** Build `paths.facts` from confirmed employers, dates, titles, skills, education and languages, with an empty gap table. Build `paths.master_cv` from the English CV as labelled lines, e.g. `[EXP-1-2]`, `[SKILL-3]`. Show the text for review; ask about every ambiguity or conflict. Both are create-only during onboarding. The master CV is created once and never rewritten. If it already exists, retain it and report discrepancies; do not silently reconcile. Ask "Is anything in this CV something you do not want to claim in letters?" Record the answers in `honesty.known_risk_lines` or `honesty.never_claim`.
+7. **Numbers.** List every CV metric and confirm each separately. Only confirmed values enter `honesty.allowed_numbers`; unconfirmed numbers never enter a letter or tuned CV. Dates and contacts are not achievement metrics. Record skipped/unconfirmed items.
+8. **ATS read.** Automatically use `ats-screening` Stage 1 on the supplied English CV. Print `ATS Technical Score: XX/100` and its breakdown only when the PDF check actually ran. With pasted/text CV input or unavailable PDF dependencies, print `ATS Technical Score: NOT VERIFIED` with the reason; never invent a numeric score. List parsing risks and checks not available. Offer general `/apply tune` (no vacancy); run a rewrite only after the user says yes. Never edit the final CV or master.
+9. **Base cover letter.** Draft one per chosen language, English and/or Ukrainian, strictly from facts and targets. Use the configured length/style and humanizer. Run `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/grounding_audit.py" "<temporary-draft>" --kind letter`, then `grounding-audit` for semantic checks. A temporary draft is not an agreed base letter: do not save an agreed letter with an open FAIL; resolve every WARN in writing. After the user confirms the audited text, save create-only under `paths.letter_kb` and register `{key: base_en, path: "base_en.md"}` and/or `{key: base_uk, path: "base_uk.md"}` in `letters.base_letters`. Retain legacy entries during update.
+10. **Links.** Ask GitHub, LinkedIn, portfolio, all or none. Save only approved `{label, url}` entries to `identity.links`; validate HTTP(S) URL syntax, never open a link. These URLs are private identity patterns. For explicit none, keep `identity.links: []` and add `<!-- jobsearch:links-none -->` to the facts file after confirmation (two if it already exists). If facts were skipped, list the no-links answer as unsaved and ask again in update; do not invent another config key.
+11. **Done.** Re-read saved files, run `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/onboarding.py" status`, summarize saved and skipped answers, and point to `/jobsearch:help` and `jobsearch-setup update`. Do not say complete when pieces remain missing. Create a short `START_HERE.md` and `TODO.md` only if absent, from the saved state; do not replace an existing overview.
+
+## Letter and CV languages
+
+The CV, master CV, `/apply tune` output and targeted CV copies are always English. Letters follow the vacancy language when it is English or Ukrainian. For any other vacancy language, ask the user to choose English or Ukrainian and suggest English. `/apply` selects `base_en` or `base_uk` for the chosen language; if absent, draft from facts after reporting that absence.
+
+## Mode `update`: privacy destinations
+
+`privacy.approved_destinations` starts empty. To add OR remove one entry:
+1. Show the exact destination, purpose and data involved. Ask for confirmation 1 in chat. Wait for an explicit answer naming the destination.
+2. Ask a separate confirmation 2; do not bundle the two questions or treat one yes as both. For `git_private_repo`, each answer must also confirm the repository is private and that personal data may be pushed there. Never approve a public repo. Visibility is the user's statement; the hook does not query the network to verify it.
+3. Back up the current config, add/remove only that exact entry, validate and re-read. Types: `{type: git_private_repo, remote: "github.com/<owner>/<repo>"}` (no `.git`); `{type: mcp_tool, tool: "mcp__<server>__<tool>"}`; `{type: host, host: "<exact-host>"}`. No wildcards or whole-server tool grants. For connectors approve the exact supported non-message tool; host grants do not authorize a URL embedded in a document. Never add a send/reply/apply/submit grant: hard rule 1 cannot be overridden. Unknown/generic executors stay denied even with a grant; source review and explicit classification are required first.
+4. This grant never authorizes an outbound call by itself. EACH later call needs a fresh explicit yes in chat naming its destination and content (confirmation 1), then the hook's ask (confirmation 2). Final sends/submissions always deny under hard rule 1. Applications and recruiter messages remain drafts.

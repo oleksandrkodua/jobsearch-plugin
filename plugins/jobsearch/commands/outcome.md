@@ -1,6 +1,6 @@
 ---
 description: Record an outcome for an application (reply, rejection, interview, silence) in the tracker with valid statuses. Offers /interview debrief after an interview.
-argument-hint: <company or tracker id> <what happened>
+argument-hint: "<company or tracker id> <what happened>"
 ---
 
 Read `${CLAUDE_PLUGIN_ROOT}/reference/hard-rules.md` and `${CLAUDE_PLUGIN_ROOT}/reference/statuses.md`, then the user's config (data dir; run `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/datadir.py" show` to print the data dir, the config path and the absolute `paths.*`). Input: $ARGUMENTS

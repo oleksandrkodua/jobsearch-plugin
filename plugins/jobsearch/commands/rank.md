@@ -1,6 +1,6 @@
 ---
 description: Triage one or more vacancies (URL, pasted text, screenshot). Duplicate check, legitimacy, blockers, match %, APPLY / NOT APPLY. Writes no CV and no letter.
-argument-hint: <vacancy URL(s) or pasted text>   [--country any|ukraine|not_ukraine] [--remote any|yes|no]
+argument-hint: "<vacancy URL(s) or pasted text>   [--country any|ukraine|not_ukraine] [--remote any|yes|no]"
 ---
 
 Read `${CLAUDE_PLUGIN_ROOT}/reference/hard-rules.md`, then the user's config (data dir; run `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/datadir.py" show` to print the data dir, the config path and the absolute `paths.*`) and the files named by `paths.facts` and `paths.master_cv`. Input: $ARGUMENTS

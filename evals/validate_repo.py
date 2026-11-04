@@ -55,6 +55,25 @@ for d in SKILLS:
     else:
         check(f"skill {name}: evals/evals.json exists", os.path.exists(os.path.join(d, "evals", "evals.json")))
 
+# Safe scalar frontmatter: colon-space inside a plain YAML description is not valid YAML.
+# Generated/source descriptions may use JSON-quoted scalars, a portable YAML subset (stdlib only).
+for _p in sorted(glob.glob(f"{PLUGIN}/skills/*/SKILL.md") + glob.glob(f"{PLUGIN}/commands/*.md")):
+    _head = read(_p).split("\n---", 1)[0]
+    _m = re.search(r"(?m)^description:\s*(.+)$", _head)
+    _ok = bool(_m)
+    if _m:
+        _value = _m.group(1).strip()
+        if _value.startswith('"'):
+            try: _ok = isinstance(json.loads(_value), str)
+            except ValueError: _ok = False
+        else:
+            _ok = not bool(re.search(r":(?:\s|$)|\s#", _value))
+    _hint = re.search(r"(?m)^argument-hint:\s*(.+)$", _head)
+    if _hint:
+        try: _ok &= isinstance(json.loads(_hint.group(1)), str)
+        except ValueError: _ok = False
+    check(f"valid scalar frontmatter: {_p}", _ok)
+
 # 3b skill descriptions say when NOT to use the skill (names the neighbour)
 EXCL = r"\b(not for|not a|not an|do not use|never use)\b|\(use [a-z-]+\)|use [a-z-]+ instead"
 for p in sorted(glob.glob(f"{PLUGIN}/skills/*/SKILL.md")):

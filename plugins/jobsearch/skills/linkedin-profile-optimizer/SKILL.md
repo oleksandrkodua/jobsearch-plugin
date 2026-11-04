@@ -53,3 +53,5 @@ Use this mode when a jobsearch data dir is configured (`JOBSEARCH_DATA_DIR` / `J
 ## Review output
 
 Lead with the assessment. Note what already works, then prioritize specific issues with original wording, why it matters, and grounded replacement text. State what remains unverified, including actual search results and unseen profile sections. Do not assign invented searchability, completeness or match percentages. Do not treat inferred skills, search appearance, or an AI-generated Recruiter relevance label as proof of a person's abilities.
+
+Use `language.chat` (uk/en) for conversation. Read the user-approved `identity.links` from config; include them only where the user asks and never open them automatically.

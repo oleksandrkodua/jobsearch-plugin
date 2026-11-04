@@ -1,0 +1,12 @@
+{
+  "hooks": {
+    "SessionStart": [{
+      "matcher": "startup|resume|clear|compact|fork",
+      "hooks": [{"type": "command", "command": "python3 \"${PLUGIN_ROOT}/hooks/session_start.py\""}]
+    }],
+    "PreToolUse": [{
+      "matcher": "Bash|apply_patch|mcp__.*",
+      "hooks": [{"type": "command", "command": "python3 \"${PLUGIN_ROOT}/hooks/codex_guard.py\""}]
+    }]
+  }
+}

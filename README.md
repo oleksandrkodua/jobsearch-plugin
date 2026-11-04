@@ -1,26 +1,26 @@
-# jobsearch
+# Jobsearch for Claude Code and Codex
 
-A Claude Code plugin that works as a neutral job-search engine for any profession. It triages vacancies, drafts honest cover letters, audits every claim against the user's own facts, and edits a tracker only through a safe script. It never sends, applies or submits anything.
+A job-search plugin for Claude Code and Codex that works as a neutral job-search engine for any profession. It triages vacancies, drafts honest cover letters, audits every claim against the user's own facts, and edits a tracker only through a safe script. It never sends, applies or submits anything.
 
 Personal data (profile, tracker, applications, private config) lives in the user's own data folder. This repository holds none.
 
 ## What's inside
 
-Most of the workflow lives in 10 slash commands, called as `/jobsearch:<name>`. The 6 skills are helpers: Claude uses them inside those commands, or on their own when you ask for that task directly. Scripts do the deterministic work (tracker edits, audits, reports), so the model never edits the tracker by hand.
+In Claude Code, the workflow uses 10 slash commands, called as `/jobsearch:<name>`, plus 6 helper skills. The Codex local edition builds the same 10 workflows as native skills (for example `$jobsearch-rank`) and includes the same 6 helpers. Startup, help, setup reminders and scanner messages use the active program's command names. Scripts do the deterministic work (tracker edits, audits, reports), so the model never edits the tracker by hand.
 
 ### Commands
 
 | Command | What it does | Typical use |
 |---|---|---|
 | `rank` | Triages one or more vacancies (URL, pasted text, screenshot): host check, legitimacy observations, repost and duplicate check, blockers from config, requirement matrix, match %, verdict APPLY / NOT APPLY / ASK THE USER. Up to 10 vacancies per run; the rest is offered as the next batch. Optional location filter: Ukraine or not, remote or not (`--country`, `--remote`, defaults in `targets.country` / `targets.remote`); a vacancy whose location is not stated is never filtered out. Writes no CV and no letter. | You found a vacancy and want to know whether it is worth applying. |
-| `apply` | Prepares one application: ATS pass, optional targeted CV copy, cover letter (drafter, reviewer, humanizer passes), then a mandatory grounding audit before hand-over. Never sends. Mode `tune`: ATS feedback and grounded CV rewrite suggestions for one vacancy; a targeted CV copy only on request. | The verdict is APPLY and you want the letter and a checklist ready to send yourself. Or `tune`: see how to tailor your CV to one vacancy without inventing anything. |
+| `apply` | Prepares one application: ATS pass, optional targeted CV copy, cover letter (drafter, reviewer, humanizer passes), then a mandatory grounding audit before hand-over. Never sends. Mode `tune`: ATS feedback and grounded English CV rewrite suggestions for one vacancy, or general feedback without a vacancy; a targeted CV copy only on request. | The verdict is APPLY and you want the letter and a checklist ready to send yourself. Or `tune`: see how to tailor your CV to one vacancy without inventing anything. |
 | `outcome` | Records a reply, rejection, interview or silence in the tracker with valid statuses, via `tracker_edit.py`. Offers `/interview debrief` after an interview. | A company answered, or you decided it will not. |
 | `followup` | Lists applications waiting for an answer for N days and drafts a short follow-up. Draft only. | A week or two passed with no reply. |
 | `interview` | Interview support for a tracked application, in three modes. `prep` (default): likely questions mapped to your story bank, consistency brief, gap bridges, questions to ask, optional mock interview. `debrief`: captures what was asked and what went badly, writes a debrief file, tags gaps. `redflags`: checks the employer against your blockers and red-flag list as SEEN / NOT SEEN / ASK. | Before a call (`prep`), right after it (`debrief`), or when something feels off about an employer (`redflags`). |
 | `upskill` | Skill-gap heat map from your real rejections and declined vacancies, with a prioritized learning plan and study order. Aggregate mode, one vacancy URL, or `roadmap`: a 12-month career map with monthly goals, certifications and networking. | You want to know which gaps actually cost you vacancies. |
 | `funnel` | Read-only funnel report from the tracker: stages, reply rate by host class and role type, rejection reasons by gap tag, median days to first reply. | You want the numbers and patterns across all applications. |
 | `scan` | On-demand scan of approved employer job boards (Greenhouse, Lever) for new vacancies, off by default. Lists candidates with country/remote filter and blockers, always shows what was filtered and why, and hands picked ones to `rank`. Never applies. | You follow a few employers and want their new QA roles without opening each board. |
-| `jobsearch-setup` | Creates a new data folder skeleton (profile, tracker header, config from the template, optional preset). Refuses any folder that is not new or empty. | First run, once. |
+| `jobsearch-setup` | Guided setup: language (UK/EN), targets, limits, English CV, confirmed facts/master, metrics, ATS read, base letters and approved links. New/empty skeleton only; `update` reviews an existing folder and changes selected answers after confirmation. | First run, once. |
 | `help` | Shows every command (with its modes) and skill in one line each, the usual workflow and whether a data folder is set up. Works in any project, also before setup. Changes nothing. | You are new to the plugin, or forgot which command does what. |
 
 ### Skills
@@ -40,13 +40,13 @@ Plugin-level list with the scripts: `plugins/jobsearch/README.md`.
 
 ### Session-start context
 
-A PreToolUse write guard (`plugins/jobsearch/hooks/guard_writes.py`) enforces hard rules 5 and 6 in code: Claude cannot write the tracker, the final CV files or the master CV directly, and must ask before editing the facts file. In the job-search project it also asks before any browser or computer-use click, typing, form filling or submit, and before any tool that sends or replies, so an Apply or Send control is always yours (hard rule 1). `tracker_edit.py` locks the tracker while it writes, so two sessions cannot lose each other's edit. The plugin also includes a read-only SessionStart hook (`plugins/jobsearch/hooks/session_start.py`). In the configured job-search project it first shows what each command and skill does (one line each, with its modes), then loads the overview and open TODO items (at most 30, plus a count of the rest) into Claude's context on startup, resume, clear or compact. It stays silent in unrelated projects, on data/config errors, or when the project already defines its own SessionStart hook. Details: the "Session-start hook" section of `plugins/jobsearch/README.md`.
+A PreToolUse write guard (`plugins/jobsearch/hooks/guard_writes.py`) enforces hard rules 5 and 6 in code: Claude cannot write the tracker, the final CV files or the master CV directly, and must ask before editing the facts file. It denies recognized send/reply/apply/submit tools even with an approved destination. In the job-search project it also denies browser/computer interactions that can activate those controls; the user interacts with the page manually (hard rule 1). `tracker_edit.py` locks the tracker while it writes, so two sessions cannot lose each other's edit. The plugin also includes a read-only SessionStart hook (`plugins/jobsearch/hooks/session_start.py`). In the configured job-search project it first shows what each command and skill does (one line each, with its modes), then loads the overview and open TODO items (at most 30, plus a count of the rest) into Claude's context on startup, resume, clear or compact. It stays silent in unrelated projects, on data/config errors, or when the project already defines its own SessionStart hook. Details: the "Session-start hook" section of `plugins/jobsearch/README.md`.
 
 ### Coming next
 
 Both approved addenda are shipped: CV tailoring (`/apply tune`) and the career pack (`/upskill roadmap`, the data-dir mode of `linkedin-profile-optimizer`, `career-paths`). The portal scanner (Greenhouse and Lever) ships off by default. The next planned phases are an application-form assistant and email reply-watch; see `docs/alternative-flow.md`. Ideas set aside on purpose, with the evidence that would bring them back, are in `docs/deferred-ideas.md`.
 
-## Install
+## Install in Claude Code
 
 ```
 claude plugin marketplace add <github-owner>/jobsearch-plugin
@@ -74,11 +74,11 @@ What the plugin itself does with your profile, CV, tracker and config (checked 2
 - **No telemetry, no uploads:** no script sends anything anywhere. The only network calls in scripts are `robots_check.py`, which downloads a site's public `robots.txt`, and `portal_scan.py`, which fetches only the approved job-board endpoints and their `robots.txt` with a generic user agent. Neither sends anything about you.
 - **Fetches send nothing personal:** commands fetch only the vacancy or employer URLs you give, plus web searches for study resources or salary ranges. The plugin's rules forbid opening links found inside a vacancy.
 - **The scanner sends nothing personal either:** `/jobsearch:scan` (off by default) fetches only the job-board endpoints you approved, with a generic user agent, after a robots check.
-- **Nothing is sent, posted or submitted on your behalf** (hard rule 1). You send every letter and every application yourself. In the job-search project, the write and outreach guard hook asks before any browser click, typing or submit, and before any tool that sends or replies.
+- **Nothing is sent, posted or submitted on your behalf** (hard rule 1). You send every letter and every application yourself. The hook denies recognized final-delivery tools regardless of grants, and blocks browser click/type/fill/submit interactions in the job-search project.
 - **Never in the public repo:** the publish gate blocks any push that contains your configured identity values, data-folder path or secrets.
 - **Claude itself:** like any Claude Code session, the text you work with is processed by the model you use. The plugin adds no other recipient.
 
-Known limit, to be closed in 1.0.0 by the approved egress guard (hard rule 8, `docs/superpowers/specs/2026-11-04-egress-guard-addendum.md`): the plugin's rules say what to fetch and send, but no hook yet checks that a web search, a fetched URL or another connector call (for example publishing a page or creating a document) carries no personal value. Until then, nothing personal should leave except where you explicitly asked for it.
+The egress guard (hard rule 8) blocks configured identity values in searches and fetched URLs, including percent-encoded values. Supported non-message connector writes and git/gh/curl/wget/scp/rsync transfers need an exact approved destination, a fresh explicit confirmation in chat and the hook's permission ask. Send/reply/apply/submit actions cannot be granted. Unknown connectors and generic executors (`js`, `execute`, `request`, etc.) are denied even with a destination grant or a `GET`/`read` hint. Read access uses exact built-in tool classifications in `hooks/egress.py`; unfamiliar tools require source review and classification before use. Classified connector reads also check their input for configured personal values. Git pushes require an approved private-repository entry. Configured outbound/protected writes fail closed if a check errors. Private visibility and the first chat confirmation are user attestations; the hook cannot verify them independently. It is not a sandbox for arbitrary executable code. See `docs/superpowers/specs/2026-11-04-egress-guard-addendum.md`.
 
 ## Hard rules
 
@@ -105,3 +105,31 @@ Requires Python 3.9+. Python standard library only, with two optional extras for
 ## Licence and notices
 
 `LICENSE`. Third-party licences and credited ideas: `THIRD-PARTY-NOTICES.md`.
+
+## Guided setup and languages
+
+Run `/jobsearch:jobsearch-setup` for a new folder or `/jobsearch:jobsearch-setup update` to review existing answers and skipped steps. The wizard confirms each save, backs up overwrites after two separate confirmations, and creates a master CV only once. Final CV files remain read-only. Run `plugins/jobsearch/scripts/onboarding.py` with `status` to see missing pieces without exposing profile values.
+
+Chat is Ukrainian or English. CVs, master CVs and tune output are English; supply an English CV rather than asking the wizard to translate facts. Letters are Ukrainian or English, following the vacancy when possible; otherwise the user chooses. `base_en` and `base_uk` base letters are audited before being agreed. The plugin does not manufacture the required user confirmations.
+
+## Install and use in Codex
+
+Build a new local marketplace with `python3 tools/build_codex.py --out <absolute-new-marketplace-folder>`, then add that folder with `codex plugin marketplace add <absolute-new-marketplace-folder>` in your own Terminal and install through a supported desktop plugin browser. Review/trust its hooks and start a new chat. The builder creates an independent package from shared sources; it copies no private data and changes no installed plugin/settings. Full instructions and the command mapping: [Codex edition](docs/codex.md).
+
+Invoke `$jobsearch-help`, `$jobsearch-setup`, `$jobsearch-rank`, `$jobsearch-apply` and the other named skills, or select them in the UI. Helper skills, startup/help output, missing-setup reminders and script errors show Codex names; Claude continues to show `/jobsearch:...` commands. Both editions use the same external private data folder and config.
+
+## Behavior in Claude Code
+
+Native slash commands and `ask`/`deny` hooks support the guided wizard and the two-step outbound procedure. New CV/master creation asks; existing final CV/master writes are denied. Facts/config changes ask. Configured personal values in WebSearch/WebFetch are blocked. Supported non-message writes require an exact approved destination and fresh confirmations. Recognized final sends/submissions and unknown/generic connectors are denied; applications and messages remain drafts.
+
+## Behavior in Codex
+
+Codex's current hook does not support `ask`: it can report an error and continue that call. This edition converts every such decision to deny, so the user performs the protected save or approved outbound action manually. Analysis, prepared materials and unprotected draft/report writes use the shared workflows. Native apply_patch paths are checked. Never disable a guard or switch tools to evade the block.
+
+Hosted WebSearch is outside Codex's hook path. The skills require a local preflight for each exact query/URL before use; this is procedural, not automatic interception. Hooks require a supported local runtime and explicit trust. A missing executable, timeout or untrusted hook cannot be described as fail-closed protection. The edition is for manual local installation, not the public OpenAI plugin directory. [Runtime limits and user checks](docs/codex.md).
+
+## Pre-release architecture audit
+
+The [2026-11-04 audit](docs/audit-2026-11-04.md) records reproduced gaps and their regressions. Repairs cover valid YAML frontmatter, protected paths across Bash/MCP/downloads/symlinks, effective push destinations, ambiguous network arguments, data scope across nested/workdir calls, readiness checks and short role tokens. New setup binds both data-dir and config variables explicitly; text-only CVs never receive an invented PDF technical score.
+
+The two audit policy decisions are implemented for both hosts: final sends/submissions always deny, and unclassified/generic connectors deny before grants. Local drafts remain available; supported non-message connector writes still need exact grants (Claude asks, Codex blocks for manual execution). The candidate remains unreleased pending live client/onboarding checks. Test success is not a claim of a complete security boundary.

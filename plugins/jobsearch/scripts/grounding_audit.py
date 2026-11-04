@@ -6,7 +6,7 @@
 
 Checks a CV or cover-letter text (md/txt) against the master CV and the user's honesty limits.
 Every rule comes from the user's config (honesty.*, letters.*); nothing personal lives in this file.
-It cannot judge meaning: every WARN needs a human/Claude look. A FAIL blocks handing the text over.
+It cannot judge meaning: every WARN needs a human/model look. A FAIL blocks handing the text over.
 The master text is paths.master_cv of the resolved data folder unless --master is given.
 Exit code 1 if any FAIL, 2 if the config or master cannot be read.
 Idea and checks adapted from MadsLorentzen/ai-job-search (MIT); see THIRD-PARTY-NOTICES.md.

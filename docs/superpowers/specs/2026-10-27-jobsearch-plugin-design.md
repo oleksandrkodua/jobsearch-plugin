@@ -291,3 +291,7 @@ Exact YAML-subset loader; fingerprint length for the repost check; report format
 - Q1. Public or private GitHub repo for the plugin? (Gate is mandatory before the first push either way; public makes a fresh-history start the default.) Answer 2026-10-28: public engine repo, started from fresh history; the owner config lives in a separate private repo (with a local, unversioned backup of the pre-rewrite history).
 - Q2. Plugin name `jobsearch` (commands `/jobsearch:rank` ...) - OK?
 - Q3. Location of the owner's private config (default `<private config path, outside the repo>`).
+
+## Implemented addenda (1.0.0 candidate)
+
+Guided onboarding and create-only master creation follow `2026-11-04-onboarding-addendum.md`. No new CV builder: setup creates the master once from the English CV after confirmation and never rewrites it. Config adds `identity.links` and `privacy.approved_destinations`; chat is uk/en, CV output English. Hard rule 8 and outbound checks follow `2026-11-04-egress-guard-addendum.md`. See those addenda for the exact two-confirmation rules and the distinction between hook enforcement and chat/visibility attestations.

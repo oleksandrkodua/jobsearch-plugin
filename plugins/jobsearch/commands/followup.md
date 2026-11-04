@@ -1,6 +1,6 @@
 ---
 description: List applications waiting for an answer for N days and draft a follow-up (draft only, never sent).
-argument-hint: [days; default from followup.default_days]
+argument-hint: "[days; default from followup.default_days]"
 ---
 
 Read `${CLAUDE_PLUGIN_ROOT}/reference/hard-rules.md`, then the user's config (data dir; run `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/datadir.py" show` to print the data dir, the config path and the absolute `paths.*`). Days: $ARGUMENTS (default `followup.default_days`).

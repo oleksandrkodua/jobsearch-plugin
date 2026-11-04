@@ -1,15 +1,15 @@
 # jobsearch
 
-Claude Code plugin repo: a neutral job-search engine (triage, honest cover letters, grounding audit, tracker).
+Claude Code and Codex job-search plugin repo: a neutral job-search engine (triage, honest cover letters, grounding audit, tracker).
 Personal data (profile, tracker, applications, private config) lives in the user's data dir, never in this repo.
 
 ## Layout
 - `plugins/jobsearch/` - the plugin.
   - `commands/` - slash commands (rank, apply, outcome, followup, interview, upskill, funnel, scan, jobsearch-setup, help).
   - `skills/` - cover-letter, grounding-audit, ats-screening, humanizer, linkedin-profile-optimizer, career-paths (SKILL.md + evals.json each).
-  - `scripts/` - stdlib-only tools (datadir, tracker_edit, grounding_audit, funnel_report, repost_check, robots_check, portal_scan, publish_gate).
+  - `scripts/` - stdlib-only tools (datadir, runtime, onboarding, tracker_edit, grounding_audit, funnel_report, repost_check, robots_check, portal_scan, publish_gate).
   - `skills/ats-screening/scripts/` - PDF checks with optional extras: PyMuPDF for ats_technical_score.py, pdfplumber + pypdf for pdf_technical_check.py.
-  - `hooks/`, `reference/` (hard rules, statuses, data contract, config template).
+  - `hooks/` (Claude guard plus conservative Codex adapter), `reference/` (hard rules, statuses, data contract, config template).
 - `evals/validate_repo.py` - structure checks; `evals/fixtures/` - synthetic persona and data dir.
 - `tests/` - stdlib unittest.
 - `docs/superpowers/` - spec and plans.
@@ -27,3 +27,5 @@ Personal data (profile, tracker, applications, private config) lives in the user
 - Engine text says "the user", never a person's name. Files in English.
 - Commit locally when asked; never push without the user's say-so, and run the publish gate before any push.
 - A skill description says when NOT to use the skill; each new skill gets an evals.json with 3 synthetic prompts.
+
+Codex packaging: `python3 tools/build_codex.py --out <new-folder>` creates a local marketplace without installing it. `docs/codex.md` documents runtime differences. Workflow instructions stay canonical in commands/ and skills/; never hand-maintain a duplicate Codex workflow.

@@ -1,6 +1,6 @@
 {
   "name": "jobsearch",
-  "version": "0.4.0",
+  "version": "1.0.0",
   "description": "Job-search engine: triage, honest letters, grounding audit, tracker; personal data stays in your data dir",
   "author": {
     "name": "jobsearch maintainers"

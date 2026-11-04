@@ -28,3 +28,9 @@ The engine holds no personal data. Everything personal lives in the user's data 
 | `study_library` | `[]` (read-only folders) |
 
 A synthetic example lives in `evals/fixtures/sample-datadir/`.
+
+## Guided onboarding and outbound privacy
+
+`identity.links` holds user-approved `{label, url}` entries, included in publish-gate identity patterns. Empty means unanswered unless the facts file contains `<!-- jobsearch:links-none -->` from an explicitly confirmed none answer. `language.chat` accepts `uk`, `en` or empty (ask). CV text is English; base letters use `base_en` / `base_uk` entries in `letters.base_letters` with paths relative to `paths.letter_kb`; legacy domain keys remain supported.
+
+`privacy.approved_destinations` defaults to an empty list. Each entry is exactly `{type: git_private_repo, remote: "host/owner/repo"}`, `{type: mcp_tool, tool: "mcp__server__tool"}` or `{type: host, host: "host"}`. No wildcard grants. Setup update adds/removes entries after two separate confirmations, backup and validation. Every outbound call still needs fresh chat confirmation followed by the runtime permission ask. Host grants cannot authorize git pushes or arbitrary connector payloads.

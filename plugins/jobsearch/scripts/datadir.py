@@ -16,6 +16,8 @@ import os
 import re
 import sys
 
+import runtime
+
 ENV_DIR, ENV_CONFIG, MARKER = "JOBSEARCH_DATA_DIR", "JOBSEARCH_CONFIG", ".jobsearch-data"
 CONFIG_NAMES = ("jobsearch.config.yaml", "jobsearch.config.json")
 
@@ -25,7 +27,8 @@ class DataDirError(Exception):
 
 
 DEFAULTS = {
-    "identity": {"full_name": "", "short_name": "", "emails": [], "phones": [], "handles": [], "extra_private_terms": []},
+    "identity": {"full_name": "", "short_name": "", "emails": [], "phones": [], "handles": [], "links": [], "extra_private_terms": []},
+    "privacy": {"approved_destinations": []},
     "language": {"chat": "", "files": "en"},
     "paths": {
         "facts": "profile/facts.md", "master_cv": "profile/master_cv/MASTER_CONTENT.md", "cv_files": [],
@@ -59,28 +62,45 @@ DEFAULTS = {
 
 # ---------------------------------------------------------------- data dir
 
+def project_root(cwd):
+    """Find config/marker from a nested cwd, without crossing the nearest git boundary."""
+    here = os.path.abspath(cwd)
+    while True:
+        if (os.path.lexists(os.path.join(here, MARKER))
+                or any(os.path.isfile(os.path.join(here, n)) for n in CONFIG_NAMES)):
+            return here
+        parent = os.path.dirname(here)
+        if parent == here or os.path.lexists(os.path.join(here, ".git")):
+            return None
+        here = parent
+
+
 def resolve_data_dir(cwd, env):
     d = env.get(ENV_DIR)
     if d:
         if not os.path.isdir(d):
             raise DataDirError(f"{ENV_DIR} points to '{d}', which is not an existing folder. Create it or fix the variable.")
         return d
-    marker = os.path.join(cwd, MARKER)
-    if os.path.isfile(marker):
-        with open(marker, encoding="utf-8") as f:
-            d = f.read().strip()
-        d = os.path.join(cwd, os.path.expanduser(d)) if d else ""
-        if not d or not os.path.isdir(d):
-            raise DataDirError(f"Marker file {marker} points to '{d}', which is not an existing folder.")
-        return d
-    if os.path.isfile(os.path.join(cwd, CONFIG_NAMES[0])):
-        return cwd
+    root = project_root(cwd)
+    if root:
+        marker = os.path.join(root, MARKER)
+        if os.path.lexists(marker):
+            try:
+                with open(marker, encoding="utf-8") as f:
+                    d = f.read().strip()
+            except OSError as ex:
+                raise DataDirError("The data-folder marker cannot be read; repair it before continuing.") from ex
+            d = os.path.join(root, os.path.expanduser(d)) if d else ""
+            if not d or not os.path.isdir(d):
+                raise DataDirError(f"Marker file {marker} points to '{d}', which is not an existing folder.")
+            return d
+        return root
     raise DataDirError(
         "No data folder found. Set it up in one of three ways:\n"
         f"  1. export {ENV_DIR}=/path/to/your/data\n"
         f"  2. put a file named {MARKER} in this project, containing the path to your data folder\n"
         f"  3. keep a {CONFIG_NAMES[0]} in this project's root\n"
-        "Run /jobsearch:jobsearch-setup to create one from the plugin's config template. The tool never guesses a folder.")
+        f"Run {runtime.command('jobsearch-setup')} to create one from the plugin's config template. The tool never guesses a folder.")
 
 
 def config_path(data_dir, env):
@@ -269,11 +289,66 @@ def data_path(cfg, data_dir, key):
 
 
 # keys whose value must be one of a fixed set (the vacancy location filter of /rank)
-CHOICES = {("targets", "country"): ("any", "ukraine", "not_ukraine"), ("targets", "remote"): ("any", "yes", "no")}
+CHOICES = {("targets", "country"): ("any", "ukraine", "not_ukraine"), ("targets", "remote"): ("any", "yes", "no"),
+           ("language", "chat"): ("", "uk", "en")}
+
+
+def privacy_problems(user):
+    """Validate identity links and exact outbound destination grants. No network calls."""
+    from urllib.parse import urlsplit
+    bad = []
+    identity = user.get("identity") or {}
+    if not isinstance(identity, dict):
+        bad.append("identity must be a mapping")
+    else:
+        links = identity.get("links", [])
+        if not isinstance(links, list):
+            bad.append("identity.links must be a list")
+        else:
+            for item in links:
+                if not isinstance(item, dict) or set(item) != {"label", "url"}:
+                    bad.append("identity.links items need label and url")
+                    continue
+                try:
+                    url = urlsplit(str(item.get("url") or ""))
+                except ValueError:
+                    bad.append("identity.links contains an invalid URL")
+                    continue
+                if (not isinstance(item["label"], str) or not item["label"].strip()
+                        or url.scheme not in ("http", "https") or not url.hostname
+                        or url.username or url.password):
+                    bad.append("identity.links needs a non-empty label and an HTTP(S) URL without credentials")
+    privacy = user.get("privacy") or {}
+    if not isinstance(privacy, dict):
+        return bad + ["privacy must be a mapping"]
+    entries = privacy.get("approved_destinations", [])
+    if not isinstance(entries, list):
+        return bad + ["privacy.approved_destinations must be a list"]
+    for e in entries:
+        if not isinstance(e, dict):
+            bad.append("privacy.approved_destinations items must be mappings")
+            continue
+        kind = e.get("type")
+        key = {"git_private_repo": "remote", "mcp_tool": "tool", "host": "host"}.get(kind)
+        value = e.get(key) if key else None
+        if not key or set(e) != {"type", key} or not isinstance(value, str):
+            bad.append("privacy.approved_destinations needs type and its remote, tool or host")
+        elif kind == "git_private_repo" and not re.fullmatch(r"[A-Za-z0-9.-]+/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", value):
+            bad.append("git_private_repo remote must be host/owner/repo, without URL credentials or .git")
+        elif kind == "git_private_repo" and value.endswith(".git"):
+            bad.append("git_private_repo remote must omit .git")
+        elif kind == "mcp_tool" and not re.fullmatch(r"mcp__[A-Za-z0-9_-]+__[A-Za-z0-9_-]+", value):
+            bad.append("mcp_tool must name one exact MCP tool")
+        elif kind == "host" and not re.fullmatch(r"[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?", value):
+            bad.append("host must be an exact hostname, without a scheme, wildcard or path")
+    return bad
 
 
 def bad_choices(user):
     out = []
+    for sec in {s for s, _ in CHOICES}:
+        if sec in user and user[sec] is not None and not isinstance(user[sec], dict):
+            out.append(f"{sec} must be a mapping")
     for (sec, key), allowed in CHOICES.items():
         val = (user.get(sec) or {}).get(key) if isinstance(user.get(sec), dict) else None
         if val is not None and val not in allowed:
@@ -350,7 +425,7 @@ def main(argv, env=None, cwd=None):
     if bad:
         print("unknown config keys: " + ", ".join(bad))
         return 1
-    bad = bad_choices(user or {})
+    bad = bad_choices(user or {}) + privacy_problems(user or {})
     scan = ((user or {}).get("portals") or {}).get("scan_approved") if isinstance((user or {}).get("portals"), dict) else None
     for i, e in enumerate(scan or []):
         bad += [f"portals.scan_approved[{i}]: {p}" for p in scan_entry_problems(e)]

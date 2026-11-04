@@ -91,6 +91,11 @@ def build_patterns(identity, extra_terms, data_dir, home=None):
         local = e.split("@", 1)[0]
         if len(local) >= 3:
             add("email", local)
+    for link in identity.get("links") or []:
+        if not isinstance(link, dict) or not isinstance(link.get("url"), str):
+            raise datadir.DataDirError("identity.links items need a URL string")
+        if link["url"].strip():
+            pats.append(("link", re.compile(re.escape(link["url"].strip()), re.I)))
     for p in _clean(identity.get("phones")):
         digits = re.sub(r"\D", "", p)
         if len(digits) < 4:

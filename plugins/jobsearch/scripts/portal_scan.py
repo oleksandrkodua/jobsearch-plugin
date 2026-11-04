@@ -25,6 +25,7 @@ import urllib.robotparser
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import datadir  # noqa: E402
+import runtime  # noqa: E402
 import funnel_report  # noqa: E402
 import repost_check  # noqa: E402
 from tracker_edit import ck  # noqa: E402
@@ -106,11 +107,10 @@ def classify_remote(p):
 def _role_match(title, roles):
     if not roles:
         return True
-    t = title.lower()
+    tokens = set(re.findall(r"\w+", title.lower()))
     for role in roles:
-        r = str(role or "").lower().strip()
-        words = [w for w in re.findall(r"\w+", r) if len(w) > 2]
-        if r and (r in t or (words and all(w in t for w in words))):
+        words = re.findall(r"\w+", str(role or "").lower())
+        if words and set(words).issubset(tokens):
             return True
     return False
 
@@ -299,7 +299,7 @@ def write_report(res, today, reports_dir):
           "|---|---|---|---|---|---|---|---|"]
     L += [_row(i, p)[:-1] + f"| {_cell(r)} |" for i, (p, r) in enumerate(res["filtered"], 1)]
     L += ["", "## Already in tracker"] + ([f"- {_cell(i)}: {_cell(p['title'])} ({_cell(p['company'])})" for p, i in res["in_tracker"]] or ["- none"])
-    L += ["", "## Next step", "Pick numbers from New candidates for /jobsearch:rank (at most 10 per batch)."]
+    L += ["", "## Next step", f"Pick numbers from New candidates for {runtime.command('rank')} (at most 10 per batch)."]
     with open(path, "w", encoding="utf-8") as f:
         f.write("\n".join(L) + "\n")
     return path
@@ -423,7 +423,7 @@ def main(argv=None, env=None, cwd=None, fetch=None, robots=None):
         res, state = run_scan(cfg, d, a.today, a.country, a.remote, fetch=fetch, robots=robots)
     except ScanDisabled:
         print("The scanner is off (alt_flow.scanner.enabled: false). Approve sources first with "
-              "/jobsearch:scan approve, then set enabled: true in the config.", file=sys.stderr)
+              f"{runtime.command('scan')} approve, then set enabled: true in the config.", file=sys.stderr)
         return 2
     except (datadir.DataDirError, ValueError, OSError) as ex:
         print(f"error: {ex}", file=sys.stderr)

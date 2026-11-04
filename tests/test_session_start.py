@@ -86,7 +86,7 @@ class ContextCase(unittest.TestCase):
         d = self.data_dir(chat="")
         ctx = session_start.context(d, {})["hookSpecificOutput"]["additionalContext"]
         self.assertNotIn("answer in", ctx)
-        self.assertNotIn("language", ctx.lower())
+        self.assertNotIn("Always answer in", ctx)  # setup/help may legitimately mention language
 
     def test_missing_files_reported(self):
         d = self.data_dir(start=False)

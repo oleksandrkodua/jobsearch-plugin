@@ -5,6 +5,8 @@ Used by `/apply tune`. Three files go into `<paths.applications>/<company>_<role
 - `cv_tune_bullets.md` - only the Improved lines and the proposed Summary and Skills text, one item per line. This is the file the grounding audit checks; it never holds Original lines;
 - `audit_tune.txt` - the audit record: both audit results and how each WARN was resolved.
 
+For a general tune (no vacancy), use the dated `cv_tune_general` report/bullets/audit files in `paths.reports`, retain sections 1-6, and use target roles plus keywords recurring in at least 2 ranked files. In section 1 copy Stage 1 scores and label Job Match not applicable. CV output remains English.
+
 ## 1. Match score
 `Job Match XX/100` and `Candidate Quality XX/100`, copied from the `ats-screening` Stage 2 run, with its formula line. Not recomputed.
 

@@ -1,6 +1,6 @@
 ---
-description: Interview support for a tracked application. Modes - prep (default; likely questions mapped to the story bank, gaps flagged), debrief (capture what was asked and what went badly, write a debrief file), redflags (checklist from blockers and config, SEEN / NOT SEEN / ASK).
-argument-hint: [prep] <company or tracker id> [stage] | debrief <company> | redflags <company>
+description: "Interview support for a tracked application. Modes - prep (default; likely questions mapped to the story bank, gaps flagged), debrief (capture what was asked and what went badly, write a debrief file), redflags (checklist from blockers and config, SEEN / NOT SEEN / ASK)."
+argument-hint: "[prep] <company or tracker id> [stage] | debrief <company> | redflags <company>"
 ---
 
 Read `${CLAUDE_PLUGIN_ROOT}/reference/hard-rules.md`, `${CLAUDE_PLUGIN_ROOT}/reference/story-bank-format.md`, then the user's config (data dir; run `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/datadir.py" show` to print the data dir, the config path and the absolute `paths.*`): `paths.facts`, `paths.applications`, `paths.story_bank`, `paths.study_library`, `blockers`, `interview.redflag_checks`, `honesty.known_risk_lines`. Input: $ARGUMENTS

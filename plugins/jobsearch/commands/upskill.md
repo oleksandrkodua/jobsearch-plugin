@@ -1,6 +1,6 @@
 ---
-description: Skill-gap heat map from the user's real rejections and declined vacancies (gap table in the facts file plus the tracker), with a prioritized learning plan. Aggregate mode or one vacancy URL. Mode `roadmap [direction]`: 12-month career map.
-argument-hint: [vacancy URL | roadmap [direction]]   (no argument = aggregate over the tracker)
+description: "Skill-gap heat map from the user's real rejections and declined vacancies (gap table in the facts file plus the tracker), with a prioritized learning plan. Aggregate mode or one vacancy URL. Mode `roadmap [direction]`: 12-month career map."
+argument-hint: "[vacancy URL | roadmap [direction]]   (no argument = aggregate over the tracker)"
 ---
 
 Read `${CLAUDE_PLUGIN_ROOT}/reference/hard-rules.md`, then the user's config (data dir; run `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/datadir.py" show` to print the data dir, the config path and the absolute `paths.*`), the file `paths.facts` (its gap table, usually "Gaps from rejections", and its "Not skill gaps" list if present) and `targets`. Input: $ARGUMENTS

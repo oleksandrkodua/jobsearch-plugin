@@ -69,3 +69,7 @@ The hook does not call the network to check repository visibility. That is slow 
   - an internal error on a Check B call is denied.
 - **Unit test, shared patterns:** the hook and the publish gate use the same identity patterns.
 - **Manual checklist** on the synthetic persona.
+
+## Confirmed policy amendment after audit (2026-11-04)
+
+This amendment takes precedence over the earlier send/read connector examples above. Final send/reply/apply/submit actions always deny; they cannot be approved destinations. Browser/computer click/type/fill/submit interactions in the job-search project also deny. Unknown connectors and generic executors deny before grants; GET/read hints do not classify them. Exact built-in read classifications require source review, and classified read inputs are checked for identity values. Supported non-message writes retain the existing exact-grant/two-confirmation procedure in Claude and manual execution in conservative Codex.

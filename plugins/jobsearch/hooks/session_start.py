@@ -16,6 +16,8 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "scripts"))
 import datadir  # noqa: E402
+import onboarding  # noqa: E402
+import runtime  # noqa: E402
 
 PLUGIN_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OVERVIEW_SOURCES = ("startup", "clear", None)  # resume / compact: the user has already seen it
@@ -27,6 +29,8 @@ def _same(a, b):
 
 
 def _has_own_hook(root):
+    if runtime.CODEX:
+        return False  # a Claude project hook does not supply Codex session context
     for name in ("settings.json", "settings.local.json"):
         try:
             with open(os.path.join(root, ".claude", name), encoding="utf-8") as f:
@@ -53,7 +57,10 @@ def _description(path):
     except OSError:
         return ""
     m = re.search(r"(?m)^description:\s*(.+)$", head.split("\n---", 1)[0])
-    return m.group(1).strip() if m else ""
+    value = m.group(1).strip() if m else ""
+    if value.startswith('"'):
+        return json.loads(value)
+    return value
 
 
 def _one_liner(desc, limit=200):
@@ -72,7 +79,7 @@ def _modes(desc):
 
 def capabilities(plugin_root=PLUGIN_ROOT):
     """Markdown list of the plugin's commands and skills, one line each, from their frontmatter."""
-    lines = ["Commands (type them as /jobsearch:<name>):"]
+    lines = ["Codex skills (invoke by name, for example $jobsearch-help):"] if runtime.CODEX else ["Commands (type them as /jobsearch:<name>):"]
     cdir = os.path.join(plugin_root, "commands")
     for f in sorted(os.listdir(cdir)) if os.path.isdir(cdir) else []:
         if f.endswith(".md"):
@@ -80,12 +87,16 @@ def capabilities(plugin_root=PLUGIN_ROOT):
             modes = _modes(desc)
             lines.append(f"- `/jobsearch:{f[:-3]}` - {_one_liner(desc)}"
                          + (" Modes: " + ", ".join(f"`{m}`" for m in modes) + "." if modes else ""))
-    lines.append("Skills (Claude uses them inside the commands, or when you ask for that task):")
+    if not runtime.CODEX:
+        lines.append("Skills (Claude uses them inside the commands, or when you ask for that task):")
     sdir = os.path.join(plugin_root, "skills")
     for d in sorted(os.listdir(sdir)) if os.path.isdir(sdir) else []:
         p = os.path.join(sdir, d, "SKILL.md")
         if os.path.isfile(p):
-            lines.append(f"- `{d}` - {_one_liner(_description(p))}")
+            desc = _description(p)
+            label = "$" + d if runtime.CODEX else d
+            modes = _modes(desc) if runtime.CODEX else []
+            lines.append(f"- `{label}` - {_one_liner(desc)}" + (" Modes: " + ", ".join(modes) + "." if modes else ""))
     return "\n".join(lines)
 
 
@@ -114,11 +125,14 @@ def context(project_root, env, source=None):
              + f"\n\n===== {todo_rel} open items ({len(open_items)}) =====\n" + "\n".join(open_items[:MAX_OPEN_ITEMS] or ([todo] if todo.startswith("(missing:") else [])))
     if len(open_items) > MAX_OPEN_ITEMS:
         text += f"\n... and {len(open_items) - MAX_OPEN_ITEMS} more open items in {todo_rel}"
+    missing = onboarding.missing_steps(cfg, d)
+    if missing:
+        text += "\n\n" + onboarding.status(cfg, d)
     if overview:
         text += "\n\n===== jobsearch commands and skills =====\n" + capabilities()
     return {
         "systemMessage": f"jobsearch: {start_rel} and {todo_rel} loaded ({len(open_items)} open items).",
-        "hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": text},
+        "hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": runtime.render_text(text)},
     }
 
 

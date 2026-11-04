@@ -41,7 +41,7 @@ class ApplyTuneDocs(unittest.TestCase):
         self.assertIn("audit_tune.txt", TUNE)
         self.assertIn("audit_tune.txt", FMT)
         self.assertIn("Never overwrite an existing file", TUNE)
-        self.assertEqual(TUNE.count("audit.txt"), 1)  # only the "not audit.txt" pointer remains
+        self.assertEqual(TUNE.split("## General tune", 1)[0].count("audit.txt"), 1)  # only the "not audit.txt" pointer remains
         desc = [l for l in CMD.splitlines() if l.startswith("description:")][0]
         self.assertIn("Mode `tune`", desc)
 
