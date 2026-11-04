@@ -272,6 +272,7 @@ Validator checks kept: JSON valid; skill frontmatter name = folder; description 
 5. Nothing deleted or overwritten in the data dir without two separate confirmations; the tracker is edited only through `tracker_edit.py` (backup + changelog + before/after counts + list of changed statuses).
 6. CV files listed in `paths.cv_files` are read-only; targeted copies only when asked.
 7. No automated scraping before `robots_check.py` and a ToS read.
+8. (Approved 2026-11-04, ships in 1.0.0; addendum `2026-11-04-egress-guard-addendum.md`.) Personal data leaves the machine only to a destination the user approved, after two separate confirmations; web searches and fetched URLs never carry personal values; a git push with personal data goes only to an approved private repository.
 
 ## 11. Left to the builder
 Exact YAML-subset loader; fingerprint length for the repost check; report formatting; eval prompts per skill (3-5 each, synthetic persona); wording of README and setup prompts.

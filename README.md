@@ -66,6 +66,18 @@ The plugin finds your data folder in this order: (1) `JOBSEARCH_DATA_DIR`; (2) a
 - `publish_gate.allow` in the private config lists per-file exceptions (for example the copyright line in `LICENSE`): a hit is skipped only inside that exact file and only for text within the allowed value. Commit authors and messages, ref names and file names are never exempt.
 - The validator skips the gate with a WARN when no private config is available.
 
+## Where your personal data goes
+
+What the plugin itself does with your profile, CV, tracker and config (checked 2026-11-04):
+- **Stays on your machine:** everything personal lives in your data folder and your private config. The plugin's scripts read and write only there (the tracker only through `tracker_edit.py`, with a backup and a changelog).
+- **No telemetry, no uploads:** no script sends anything anywhere. The only network call in a script is `robots_check.py`, which downloads a site's public `robots.txt` and sends nothing about you.
+- **Fetches send nothing personal:** commands fetch only the vacancy or employer URLs you give, plus web searches for study resources or salary ranges. The plugin's rules forbid opening links found inside a vacancy.
+- **Nothing is sent, posted or submitted on your behalf** (hard rule 1). You send every letter and every application yourself. In the job-search project, the write and outreach guard hook asks before any browser click, typing or submit, and before any tool that sends or replies.
+- **Never in the public repo:** the publish gate blocks any push that contains your configured identity values, data-folder path or secrets.
+- **Claude itself:** like any Claude Code session, the text you work with is processed by the model you use. The plugin adds no other recipient.
+
+Known limit, to be closed in 1.0.0 by the approved egress guard (hard rule 8, `docs/superpowers/specs/2026-11-04-egress-guard-addendum.md`): the plugin's rules say what to fetch and send, but no hook yet checks that a web search, a fetched URL or another connector call (for example publishing a page or creating a document) carries no personal value. Until then, nothing personal should leave except where you explicitly asked for it.
+
 ## Hard rules
 
 Never send or apply, facts only from the data folder, the tracker changes only through `tracker_edit.py`. They cannot be switched off by config: `plugins/jobsearch/reference/hard-rules.md`.
