@@ -59,7 +59,7 @@ thresholds: {apply: 80, decline: 65}
 
 portals:
   # job_portals / employer_ats accept portal names ("LinkedIn") or hosts ("jobs.example.org"). Dotted entry = that host or any subdomain (leading www./*. ignored); dotless name = normalised (lowercase, no spaces . - _) equal to a whole host label, or that label + hq/jobs/careers; the last label (TLD) is never used for names.
-  job_portals: [djinni.co, dou.ua, indeed.com, stepstone.de]
+  job_portals: [djinni.co, dou.ua, indeed.com, stepstone.de, robota.ua, work.ua, jobico.io]
   employer_ats: [greenhouse, lever, workable, ashby, recruitee, personio, teamtailor, smartrecruiters, breezy]
   confirmed_domains: []
   scan_approved: []     # /jobsearch:scan sources, added only by its approve step:
