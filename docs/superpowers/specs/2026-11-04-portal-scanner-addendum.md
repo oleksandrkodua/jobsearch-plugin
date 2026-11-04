@@ -1,6 +1,6 @@
 # Addendum A1: portal scanner (`/jobsearch:scan`)
 
-Status: APPROVED by the owner 2026-11-04. Open questions Q1-Q3 (§11) are answered before the plan is written.
+Status: APPROVED by the owner 2026-11-04. Q1-Q3 (§11) answered 2026-11-04; the plan can be written.
 Parent spec: `2026-10-27-jobsearch-plugin-design.md` §6.7 A1 (copied in `docs/alternative-flow.md`). This addendum details A1 and does not weaken any hard rule in `plugins/jobsearch/reference/hard-rules.md`.
 
 ## 1. Intent
@@ -114,7 +114,7 @@ The plugin never adds an entry on its own.
 - **The guard hook:** a scan never writes the tracker.
 - **Manual trial,** after the owner approves one real source: one run, the report checked by hand, and the requests counted against the cap.
 
-## 11. Open questions for the owner
-- Q1. Which companies or portals do you want first? Each needs a one-time approval (§5).
-- Q2. Is on-demand only (no schedule) acceptable for the first version?
-- Q3. Should the pre-filter hide filtered postings by default and show them on request, or always list them (current draft: always list)?
+## 11. Owner decisions (answered 2026-11-04)
+- **Q1, first sources.** The first version supports only two source types: `greenhouse:<board>` and `lever:<company>`. Ashby, SmartRecruiters, Recruitee, Personio, Workable and `rss:<url>` stay in §3 as later additions, each needing its own small change. The concrete employers are chosen at approval time, one `scan_approved` entry each (§5).
+- **Q2, schedule.** On demand only. `/jobsearch:scan` runs when the user calls it; there is no schedule, cron or background run.
+- **Q3, filtered postings.** Always listed in the report and in chat, with the reason, never hidden (§6 step 5, §7).
