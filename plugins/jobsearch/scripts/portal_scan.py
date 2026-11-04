@@ -307,28 +307,35 @@ def write_report(res, today, reports_dir):
 
 def _insert_entry(text, line):
     """Insert one flow-map line into portals.scan_approved of a block-style YAML config."""
+    nl = "\r\n" if "\r\n" in text else "\n"
     lines = text.splitlines()
     try:
         p = next(i for i, l in enumerate(lines) if re.match(r"^portals:\s*(#.*)?$", l))
     except StopIteration:
         if re.search(r"(?m)^portals:", text):
             raise ValueError("portals is written in flow style; add the entry by hand")
-        return text.rstrip("\n") + "\nportals:\n  scan_approved:\n" + line + "\n"
-    end = next((i for i in range(p + 1, len(lines)) if lines[i] and not lines[i][0].isspace()), len(lines))
+        return text.rstrip("\r\n") + nl + "portals:" + nl + "  scan_approved:" + nl + line + nl
+
+    def code(l):
+        return bool(l.strip()) and not l.lstrip().startswith("#")
+
+    end = next((i for i in range(p + 1, len(lines)) if code(lines[i]) and not lines[i][0].isspace()), len(lines))
     s = next((i for i in range(p + 1, end) if re.match(r"^\s+scan_approved:", lines[i])), None)
     if s is None:
         lines[p + 1:p + 1] = ["  scan_approved:", line]
     else:
         if re.match(r"^\s+scan_approved:\s*\[\s*\]", lines[s]):
             lines[s] = "  scan_approved:"
+        indent = len(lines[s]) - len(lines[s].lstrip())
         last = s
         for i in range(s + 1, end):
-            if re.match(r"^\s{4,}-\s", lines[i]):
-                last = i
-            elif lines[i].strip() and not lines[i].startswith("    "):
+            if not code(lines[i]):
+                continue
+            if len(lines[i]) - len(lines[i].lstrip()) <= indent:
                 break
+            last = i
         lines.insert(last + 1, line)
-    return "\n".join(lines) + "\n"
+    return nl.join(lines) + nl
 
 
 def approve_source(config_path, source, tos_checked, today, robots=None, confirmed=False):
@@ -336,13 +343,15 @@ def approve_source(config_path, source, tos_checked, today, robots=None, confirm
     if not confirmed:
         raise ValueError("approval needs two confirmations from the user in chat, then --confirmed")
     url = endpoint(source)
-    if not re.match(r"^\d{4}-\d{2}-\d{2}$", tos_checked or ""):
+    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", tos_checked or ""):
         raise ValueError("tos_checked must be the date YYYY-MM-DD on which the user read the terms")
     if config_path.endswith(".json"):
         raise ValueError("JSON config: add the entry by hand")
-    with open(config_path, encoding="utf-8") as f:
+    with open(config_path, encoding="utf-8", newline="") as f:
         text = f.read()
-    if re.search(rf'source:\s*"?{re.escape(source)}"?', text):
+    cur = datadir.load_config(os.path.dirname(config_path), {datadir.ENV_CONFIG: config_path})
+    if any(isinstance(e, dict) and e.get("source") == source
+           for e in (cur.get("portals") or {}).get("scan_approved") or []):
         raise ValueError(f"{source} is already approved")
     verdict = (robots or default_robots)(url)
     if verdict != "ALLOWED":
@@ -353,7 +362,7 @@ def approve_source(config_path, source, tos_checked, today, robots=None, confirm
     new = _insert_entry(text, line)
     backup = f"{config_path}.bak-{datetime.datetime.now().strftime('%Y%m%d_%H%M%S_%f')}"
     shutil.copy2(config_path, backup)
-    with open(config_path, "w", encoding="utf-8") as f:
+    with open(config_path, "w", encoding="utf-8", newline="") as f:
         f.write(new)
     try:
         cfg = datadir.load_config(os.path.dirname(config_path), {datadir.ENV_CONFIG: config_path})

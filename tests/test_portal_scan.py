@@ -409,5 +409,66 @@ class Approve(unittest.TestCase):
         self.assertIn("by hand", str(cm.exception))
 
 
+    def write(self, text, newline=""):
+        with open(self.cfg_path, "w", encoding="utf-8", newline=newline) as f:
+            f.write(text)
+
+    def test_prefix_source_does_not_block(self):
+        self.approve("greenhouse:acme-corp")
+        self.approve("greenhouse:acme")
+        self.assertEqual([x["source"] for x in self.entries()], ["greenhouse:acme-corp", "greenhouse:acme"])
+
+    def test_commented_line_does_not_block(self):
+        self.write('portals:\n  scan_approved:\n#    - {source: "greenhouse:acme"}\n  confirmed_domains: []\n')
+        self.approve("greenhouse:acme")
+        self.assertEqual([x["source"] for x in self.entries()], ["greenhouse:acme"])
+
+    def test_block_map_entry_then_sibling_key(self):
+        self.write('portals:\n  scan_approved:\n    - source: "lever:northwind"\n      host: "api.lever.co"\n'
+                   '      robots: ALLOWED\n      tos_checked: "2026-11-04"\n      approved_by_user: "2026-11-04"\n'
+                   '# note\n  confirmed_domains: []\n')
+        self.approve()
+        cfg = ps.datadir.load_config(os.path.dirname(self.cfg_path), {})
+        e = cfg["portals"]["scan_approved"]
+        self.assertEqual([x["source"] for x in e], ["lever:northwind", "greenhouse:examplecorp"])
+        self.assertEqual([ps.datadir.scan_entry_problems(x) for x in e], [[], []])
+        self.assertEqual(cfg["portals"]["confirmed_domains"], [])
+
+    def test_inline_empty_list(self):
+        self.write('portals:\n  scan_approved: []\n  confirmed_domains: []\n')
+        self.approve()
+        self.assertEqual(len(self.entries()), 1)
+
+    def test_trailing_newline_source_rejected(self):
+        with self.assertRaises(ValueError):
+            ps.endpoint("lever:a\n")
+
+    def test_crlf_preserved(self):
+        self.write('portals:\r\n  job_portals:\r\n    - "dou.ua"\r\nletters: {words_min: 150}\r\n')
+        self.approve()
+        with open(self.cfg_path, "rb") as f:
+            b = f.read()
+        self.assertEqual(b.count(b"\r\n"), b.count(b"\n"))
+        self.assertEqual(len(self.entries()), 1)
+
+    def test_restore_on_broken_result(self):
+        before = self.read()
+        orig = ps._insert_entry
+        ps._insert_entry = lambda text, line: "portals: [\n"
+        self.addCleanup(setattr, ps, "_insert_entry", orig)
+        with self.assertRaises(ValueError) as cm:
+            self.approve()
+        self.assertIn("restored", str(cm.exception))
+        self.assertEqual(self.read(), before)
+        self.assertEqual(len([f for f in os.listdir(os.path.dirname(self.cfg_path)) if ".bak-" in f]), 1)
+
+    def test_cli(self):
+        d = os.path.dirname(self.cfg_path)
+        base = ["approve", "lever:northwind", "--tos-checked", "2026-11-04", "--config", self.cfg_path]
+        self.assertEqual(ps.main(base, env={}, cwd=d, robots=lambda u: "ALLOWED"), 1)
+        self.assertEqual(ps.main(base + ["--confirmed"], env={}, cwd=d, robots=lambda u: "ALLOWED"), 0)
+        self.assertEqual(len(self.entries()), 1)
+
+
 if __name__ == "__main__":
     unittest.main()

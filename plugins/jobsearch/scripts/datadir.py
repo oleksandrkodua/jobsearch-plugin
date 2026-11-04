@@ -281,7 +281,7 @@ def bad_choices(user):
     return out
 
 
-SCAN_SOURCE_RE = re.compile(r"^(greenhouse|lever):([a-z0-9][a-z0-9-]*)$")  # A1: first-version source types
+SCAN_SOURCE_RE = re.compile(r"^(greenhouse|lever):([a-z0-9][a-z0-9-]*)\Z")  # A1: first-version source types
 _DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
