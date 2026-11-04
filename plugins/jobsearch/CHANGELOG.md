@@ -2,6 +2,7 @@
 
 ## 0.5.0 (unreleased)
 - `/rank` location filter: country (`any` | `ukraine` | `not_ukraine`) and remote (`any` | `yes` | `no`), defaults in `targets.country` / `targets.remote`, overridden per run with `--country` / `--remote`. Classified from the vacancy text only; Unknown is never filtered out; filtered vacancies stay in the batch table as FILTERED (country) / FILTERED (remote). `datadir.py validate` rejects other values.
+- `/jobsearch:scan` (addendum A1): on-demand scan of approved Greenhouse and Lever boards, off by default; robots re-checked every run, 5 s between requests, at most 30 per run; filtered postings always listed; candidates go to `/rank`; `approve` adds a source after two confirmations with a config backup.
 
 ## 0.4.0 (2026-11-04)
 - Write guard: PreToolUse hook `hooks/guard_writes.py` enforces hard rules 5 and 6 in code. Direct Write/Edit/MultiEdit/NotebookEdit of the tracker (with CHANGELOG.csv and history/), `paths.cv_files` and `paths.master_cv` is denied; edits of `paths.facts` and Bash commands that look like writes to protected files ask the user. Silent without a data dir or on error.

@@ -6,7 +6,7 @@ Personal data (profile, tracker, applications, private config) lives in the user
 
 ## What's inside
 
-Most of the workflow lives in 9 slash commands, called as `/jobsearch:<name>`. The 6 skills are helpers: Claude uses them inside those commands, or on their own when you ask for that task directly. Scripts do the deterministic work (tracker edits, audits, reports), so the model never edits the tracker by hand.
+Most of the workflow lives in 10 slash commands, called as `/jobsearch:<name>`. The 6 skills are helpers: Claude uses them inside those commands, or on their own when you ask for that task directly. Scripts do the deterministic work (tracker edits, audits, reports), so the model never edits the tracker by hand.
 
 ### Commands
 
@@ -19,6 +19,7 @@ Most of the workflow lives in 9 slash commands, called as `/jobsearch:<name>`. T
 | `interview` | Interview support for a tracked application, in three modes. `prep` (default): likely questions mapped to your story bank, consistency brief, gap bridges, questions to ask, optional mock interview. `debrief`: captures what was asked and what went badly, writes a debrief file, tags gaps. `redflags`: checks the employer against your blockers and red-flag list as SEEN / NOT SEEN / ASK. | Before a call (`prep`), right after it (`debrief`), or when something feels off about an employer (`redflags`). |
 | `upskill` | Skill-gap heat map from your real rejections and declined vacancies, with a prioritized learning plan and study order. Aggregate mode, one vacancy URL, or `roadmap`: a 12-month career map with monthly goals, certifications and networking. | You want to know which gaps actually cost you vacancies. |
 | `funnel` | Read-only funnel report from the tracker: stages, reply rate by host class and role type, rejection reasons by gap tag, median days to first reply. | You want the numbers and patterns across all applications. |
+| `scan` | On-demand scan of approved employer job boards (Greenhouse, Lever) for new vacancies, off by default. Lists candidates with country/remote filter and blockers, always shows what was filtered and why, and hands picked ones to `rank`. Never applies. | You follow a few employers and want their new QA roles without opening each board. |
 | `jobsearch-setup` | Creates a new data folder skeleton (profile, tracker header, config from the template, optional preset). Refuses any folder that is not new or empty. | First run, once. |
 | `help` | Shows every command (with its modes) and skill in one line each, the usual workflow and whether a data folder is set up. Works in any project, also before setup. Changes nothing. | You are new to the plugin, or forgot which command does what. |
 
@@ -43,7 +44,7 @@ A PreToolUse write guard (`plugins/jobsearch/hooks/guard_writes.py`) enforces ha
 
 ### Coming next
 
-Both approved addenda are shipped: CV tailoring (`/apply tune`) and the career pack (`/upskill roadmap`, the data-dir mode of `linkedin-profile-optimizer`, `career-paths`). The next planned phases are portal auto-scanning, an application-form assistant and email reply-watch; see `docs/alternative-flow.md`. Ideas set aside on purpose, with the evidence that would bring them back, are in `docs/deferred-ideas.md`.
+Both approved addenda are shipped: CV tailoring (`/apply tune`) and the career pack (`/upskill roadmap`, the data-dir mode of `linkedin-profile-optimizer`, `career-paths`). The portal scanner (Greenhouse and Lever) ships off by default. The next planned phases are an application-form assistant and email reply-watch; see `docs/alternative-flow.md`. Ideas set aside on purpose, with the evidence that would bring them back, are in `docs/deferred-ideas.md`.
 
 ## Install
 
@@ -70,8 +71,9 @@ The plugin finds your data folder in this order: (1) `JOBSEARCH_DATA_DIR`; (2) a
 
 What the plugin itself does with your profile, CV, tracker and config (checked 2026-11-04):
 - **Stays on your machine:** everything personal lives in your data folder and your private config. The plugin's scripts read and write only there (the tracker only through `tracker_edit.py`, with a backup and a changelog).
-- **No telemetry, no uploads:** no script sends anything anywhere. The only network call in a script is `robots_check.py`, which downloads a site's public `robots.txt` and sends nothing about you.
+- **No telemetry, no uploads:** no script sends anything anywhere. The only network calls in scripts are `robots_check.py`, which downloads a site's public `robots.txt`, and `portal_scan.py`, which fetches only the approved job-board endpoints and their `robots.txt` with a generic user agent. Neither sends anything about you.
 - **Fetches send nothing personal:** commands fetch only the vacancy or employer URLs you give, plus web searches for study resources or salary ranges. The plugin's rules forbid opening links found inside a vacancy.
+- **The scanner sends nothing personal either:** `/jobsearch:scan` (off by default) fetches only the job-board endpoints you approved, with a generic user agent, after a robots check.
 - **Nothing is sent, posted or submitted on your behalf** (hard rule 1). You send every letter and every application yourself. In the job-search project, the write and outreach guard hook asks before any browser click, typing or submit, and before any tool that sends or replies.
 - **Never in the public repo:** the publish gate blocks any push that contains your configured identity values, data-folder path or secrets.
 - **Claude itself:** like any Claude Code session, the text you work with is processed by the model you use. The plugin adds no other recipient.
@@ -88,7 +90,7 @@ Never send or apply, facts only from the data folder, the tracker changes only t
 
 ## Opt-in alternative flow
 
-Portal auto-scanning, an application-form assistant and email reply-watch are planned later phases, not shipped features. Their opt-in design and approval gates are documented in `docs/alternative-flow.md`.
+The portal scanner (`/jobsearch:scan`, Greenhouse and Lever) is shipped and off by default. An application-form assistant and email reply-watch are planned later phases, not shipped features. Their opt-in design and approval gates are documented in `docs/alternative-flow.md`.
 
 ## Tests and validator
 

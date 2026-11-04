@@ -5,9 +5,9 @@ Personal data (profile, tracker, applications, private config) lives in the user
 
 ## Layout
 - `plugins/jobsearch/` - the plugin.
-  - `commands/` - slash commands (rank, apply, outcome, followup, interview, upskill, funnel, jobsearch-setup, help).
+  - `commands/` - slash commands (rank, apply, outcome, followup, interview, upskill, funnel, scan, jobsearch-setup, help).
   - `skills/` - cover-letter, grounding-audit, ats-screening, humanizer, linkedin-profile-optimizer, career-paths (SKILL.md + evals.json each).
-  - `scripts/` - stdlib-only tools (datadir, tracker_edit, grounding_audit, funnel_report, repost_check, robots_check, publish_gate).
+  - `scripts/` - stdlib-only tools (datadir, tracker_edit, grounding_audit, funnel_report, repost_check, robots_check, portal_scan, publish_gate).
   - `skills/ats-screening/scripts/` - PDF checks with optional extras: PyMuPDF for ats_technical_score.py, pdfplumber + pypdf for pdf_technical_check.py.
   - `hooks/`, `reference/` (hard rules, statuses, data contract, config template).
 - `evals/validate_repo.py` - structure checks; `evals/fixtures/` - synthetic persona and data dir.

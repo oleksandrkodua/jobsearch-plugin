@@ -6,7 +6,7 @@ A neutral job-search engine for any profession. It triages vacancies, drafts hon
 Point the plugin at your private data folder with `JOBSEARCH_DATA_DIR`. Put your settings in `jobsearch.config.yaml` inside it, or set `JOBSEARCH_CONFIG` to a config file kept elsewhere. Start from `reference/config.template.yaml` (or run `/jobsearch:jobsearch-setup`, which copies and validates it); to re-check a copy later, run the plugin's `scripts/datadir.py` with `validate PATH`. Layout and `paths.*` keys: `reference/data-contract.md`.
 
 ## Commands and skills
-The plugin has 9 commands (`/jobsearch:<name>`) and 6 skills. Most of the workflow lives in the commands; the skills are helpers used inside them or on request. Full tables: the "What's inside" section of the root `README.md`.
+The plugin has 10 commands (`/jobsearch:<name>`) and 6 skills. Most of the workflow lives in the commands; the skills are helpers used inside them or on request. Full tables: the "What's inside" section of the root `README.md`.
 
 Commands:
 - `commands/rank.md` - triage a vacancy: duplicate check, legitimacy, blockers, match %, verdict; up to 10 vacancies per run; optional filter by country (Ukraine or not) and remote (`--country`, `--remote`, or `targets.country` / `targets.remote` in the config).
@@ -16,6 +16,7 @@ Commands:
 - `commands/interview.md` - interview support: `prep` (questions mapped to the story bank), `debrief` (capture and tag gaps), `redflags` (employer checklist).
 - `commands/upskill.md` - skill-gap heat map from rejections, with a learning plan; mode `roadmap` for a 12-month career map.
 - `commands/funnel.md` - funnel and patterns report from the tracker.
+- `commands/scan.md` - on-demand scan of approved Greenhouse/Lever boards, off by default; candidates go to rank.
 - `commands/jobsearch-setup.md` - create the data folder skeleton.
 - `commands/help.md` - overview of all commands, modes and skills, the workflow and the setup status; works without a data folder.
 
@@ -30,7 +31,7 @@ Skills:
 For LinkedIn review, ask Claude to use `linkedin-profile-optimizer` with your supplied profile sections and source CV. This is a skill, not an additional file in `commands/`.
 
 ## Scripts
-`scripts/datadir.py` (data folder and config), `scripts/tracker_edit.py` (the only way the tracker is changed; it holds a lock file while it writes), `scripts/grounding_audit.py`, `scripts/funnel_report.py`, `scripts/repost_check.py`, `scripts/robots_check.py`, `scripts/publish_gate.py`, `skills/ats-screening/scripts/ats_technical_score.py` and `skills/ats-screening/scripts/pdf_technical_check.py`. Python standard library only, except two optional extras for the ATS scripts: PyMuPDF for `ats_technical_score.py`, pdfplumber + pypdf for `pdf_technical_check.py` (each says so when its extra is missing). `scripts/datadir.py show` prints the resolved data folder, config and absolute `paths.*`; data folder resolution order: `JOBSEARCH_DATA_DIR`, a `.jobsearch-data` marker file, a `jobsearch.config.yaml` in the project root.
+`scripts/datadir.py` (data folder and config), `scripts/tracker_edit.py` (the only way the tracker is changed; it holds a lock file while it writes), `scripts/grounding_audit.py`, `scripts/funnel_report.py`, `scripts/repost_check.py`, `scripts/robots_check.py`, `scripts/portal_scan.py`, `scripts/publish_gate.py`, `skills/ats-screening/scripts/ats_technical_score.py` and `skills/ats-screening/scripts/pdf_technical_check.py`. Python standard library only, except two optional extras for the ATS scripts: PyMuPDF for `ats_technical_score.py`, pdfplumber + pypdf for `pdf_technical_check.py` (each says so when its extra is missing). `scripts/datadir.py show` prints the resolved data folder, config and absolute `paths.*`; data folder resolution order: `JOBSEARCH_DATA_DIR`, a `.jobsearch-data` marker file, a `jobsearch.config.yaml` in the project root.
 
 ## Write guard hook
 
@@ -46,7 +47,7 @@ It runs only when the current project is the resolved data folder or contains a 
 
 ## Planned features
 
-CV tailoring (`apply tune`), `upskill roadmap`, the LinkedIn data-dir mode and `career-paths` are shipped. Portal auto-scanning, an application-form assistant and email reply-watch are later opt-in designs; see the root README and [alternative-flow design](../../docs/alternative-flow.md) for their status and approval gates.
+CV tailoring (`apply tune`), `upskill roadmap`, the LinkedIn data-dir mode and `career-paths` are shipped. The portal scanner `/jobsearch:scan` (Greenhouse and Lever) is shipped and off by default. An application-form assistant and email reply-watch remain later opt-in designs; see the root README and [alternative-flow design](../../docs/alternative-flow.md) for their status and approval gates.
 
 ## Rules
 The hard rules are in `reference/hard-rules.md` and cannot be switched off by config. Tracker statuses: `reference/statuses.md`. Changes: `CHANGELOG.md`.
