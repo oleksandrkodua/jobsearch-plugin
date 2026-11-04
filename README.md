@@ -12,7 +12,7 @@ Most of the workflow lives in 9 slash commands, called as `/jobsearch:<name>`. T
 
 | Command | What it does | Typical use |
 |---|---|---|
-| `rank` | Triages one or more vacancies (URL, pasted text, screenshot): host check, legitimacy observations, repost and duplicate check, blockers from config, requirement matrix, match %, verdict APPLY / NOT APPLY / ASK THE USER. Writes no CV and no letter. | You found a vacancy and want to know whether it is worth applying. |
+| `rank` | Triages one or more vacancies (URL, pasted text, screenshot): host check, legitimacy observations, repost and duplicate check, blockers from config, requirement matrix, match %, verdict APPLY / NOT APPLY / ASK THE USER. Up to 10 vacancies per run; the rest is offered as the next batch. Writes no CV and no letter. | You found a vacancy and want to know whether it is worth applying. |
 | `apply` | Prepares one application: ATS pass, optional targeted CV copy, cover letter (drafter, reviewer, humanizer passes), then a mandatory grounding audit before hand-over. Never sends. Mode `tune`: ATS feedback and grounded CV rewrite suggestions for one vacancy; a targeted CV copy only on request. | The verdict is APPLY and you want the letter and a checklist ready to send yourself. Or `tune`: see how to tailor your CV to one vacancy without inventing anything. |
 | `outcome` | Records a reply, rejection, interview or silence in the tracker with valid statuses, via `tracker_edit.py`. Offers `/interview debrief` after an interview. | A company answered, or you decided it will not. |
 | `followup` | Lists applications waiting for an answer for N days and drafts a short follow-up. Draft only. | A week or two passed with no reply. |
@@ -39,11 +39,11 @@ Plugin-level list with the scripts: `plugins/jobsearch/README.md`.
 
 ### Session-start context
 
-A PreToolUse write guard (`plugins/jobsearch/hooks/guard_writes.py`) enforces hard rules 5 and 6 in code: Claude cannot write the tracker, the final CV files or the master CV directly, and must ask before editing the facts file. The plugin also includes a read-only SessionStart hook (`plugins/jobsearch/hooks/session_start.py`). In the configured job-search project it first shows what each command and skill does (one line each, with its modes), then loads the overview and open TODO items into Claude's context on startup, resume, clear or compact. It stays silent in unrelated projects, on data/config errors, or when the project already defines its own SessionStart hook. Details: the "Session-start hook" section of `plugins/jobsearch/README.md`.
+A PreToolUse write guard (`plugins/jobsearch/hooks/guard_writes.py`) enforces hard rules 5 and 6 in code: Claude cannot write the tracker, the final CV files or the master CV directly, and must ask before editing the facts file. In the job-search project it also asks before any browser or computer-use click, typing, form filling or submit, and before any tool that sends or replies, so an Apply or Send control is always yours (hard rule 1). `tracker_edit.py` locks the tracker while it writes, so two sessions cannot lose each other's edit. The plugin also includes a read-only SessionStart hook (`plugins/jobsearch/hooks/session_start.py`). In the configured job-search project it first shows what each command and skill does (one line each, with its modes), then loads the overview and open TODO items (at most 30, plus a count of the rest) into Claude's context on startup, resume, clear or compact. It stays silent in unrelated projects, on data/config errors, or when the project already defines its own SessionStart hook. Details: the "Session-start hook" section of `plugins/jobsearch/README.md`.
 
 ### Coming next
 
-Both approved addenda are shipped: CV tailoring (`/apply tune`) and the career pack (`/upskill roadmap`, the data-dir mode of `linkedin-profile-optimizer`, `career-paths`). The next planned phases are portal auto-scanning, an application-form assistant and email reply-watch; see `docs/alternative-flow.md`.
+Both approved addenda are shipped: CV tailoring (`/apply tune`) and the career pack (`/upskill roadmap`, the data-dir mode of `linkedin-profile-optimizer`, `career-paths`). The next planned phases are portal auto-scanning, an application-form assistant and email reply-watch; see `docs/alternative-flow.md`. Ideas set aside on purpose, with the evidence that would bring them back, are in `docs/deferred-ideas.md`.
 
 ## Install
 
