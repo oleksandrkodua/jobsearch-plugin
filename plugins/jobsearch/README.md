@@ -9,7 +9,7 @@ Point the plugin at your private data folder with `JOBSEARCH_DATA_DIR`. Put your
 The plugin has 9 commands (`/jobsearch:<name>`) and 6 skills. Most of the workflow lives in the commands; the skills are helpers used inside them or on request. Full tables: the "What's inside" section of the root `README.md`.
 
 Commands:
-- `commands/rank.md` - triage a vacancy: duplicate check, legitimacy, blockers, match %, verdict; up to 10 vacancies per run.
+- `commands/rank.md` - triage a vacancy: duplicate check, legitimacy, blockers, match %, verdict; up to 10 vacancies per run; optional filter by country (Ukraine or not) and remote (`--country`, `--remote`, or `targets.country` / `targets.remote` in the config).
 - `commands/apply.md` - letter draft, optional targeted CV copy, grounding audit, hand-over (not sent); mode `tune` for grounded CV suggestions (format in `reference/cv-tune-format.md`).
 - `commands/outcome.md` - record a reply, rejection, interview or silence in the tracker.
 - `commands/followup.md` - applications waiting for an answer, follow-up drafts.

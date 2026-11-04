@@ -1,6 +1,6 @@
 ---
 description: Triage one or more vacancies (URL, pasted text, screenshot). Duplicate check, legitimacy, blockers, match %, APPLY / NOT APPLY. Writes no CV and no letter.
-argument-hint: <vacancy URL(s) or pasted text>
+argument-hint: <vacancy URL(s) or pasted text>   [--country any|ukraine|not_ukraine] [--remote any|yes|no]
 ---
 
 Read `${CLAUDE_PLUGIN_ROOT}/reference/hard-rules.md`, then the user's config (data dir; run `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/datadir.py" show` to print the data dir, the config path and the absolute `paths.*`) and the files named by `paths.facts` and `paths.master_cv`. Input: $ARGUMENTS
@@ -16,6 +16,7 @@ For EACH vacancy, in order:
    - Repost check (run the tool, do not eyeball): `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/repost_check.py" --company "<company>" --title "<title>" [--body-file <description text>]`; for `--body-file`, write the vacancy description to a temp file and pass its path. It compares company, normalised title and a description fingerprint with tracker rows and `paths.ranked` files. Hits within 90 days are listed as "possible repost"; rows without a date are listed as "unknown", not dropped.
    - Ghost signals, as observations: reposted 3 or more times, no salary and no team detail, generic body.
 3. **Parse.** Company, exact title, URL, job ID, domain, location, format, salary (never invent; unpublished = Unknown), posting date, must-have vs nice-to-have, responsibilities.
+   **Location filter.** From the vacancy text only, classify country as Ukraine / not Ukraine / Unknown and format as remote (fully remote) / not remote / Unknown. Hybrid counts as not remote. The filter is `targets.country` (any | ukraine | not_ukraine) and `targets.remote` (any | yes | no) from the config. A value given in the arguments overrides the config for this run. A vacancy that fails the filter gets the verdict FILTERED (country) or FILTERED (remote) with the reason, stays in the batch table, and skips steps 5-7. Unknown is never filtered out: say it is Unknown and continue. The filter is a preference, not a blocker.
 4. **Duplicate check (run the tool, do not eyeball):**
    `python3 "${CLAUDE_PLUGIN_ROOT}/scripts/tracker_edit.py" find --company "<company>" --position "<title>" --url "<url>" --job-id "<id>"`
    Verdict: NOT APPLIED / ALREADY APPLIED / POSSIBLY DUPLICATE (ask the user, never decide) / UNKNOWN. Show the matching ids and their status. Do not hide already-applied vacancies.

@@ -149,6 +149,21 @@ class CliTest(unittest.TestCase):
     def test_validate_fixture_ok_via_env(self):
         self.assertEqual(self.run_cli("validate", env={"JOBSEARCH_DATA_DIR": FIXTURE}).returncode, 0)
 
+    def test_location_filter_defaults_and_values(self):
+        self.assertEqual(datadir.DEFAULTS["targets"]["country"], "any")
+        self.assertEqual(datadir.DEFAULTS["targets"]["remote"], "any")
+        with tempfile.TemporaryDirectory() as t:
+            good, bad = os.path.join(t, "good.yaml"), os.path.join(t, "bad.yaml")
+            with open(good, "w") as f:
+                f.write("targets: {country: ukraine, remote: yes}\n")
+            with open(bad, "w") as f:
+                f.write("targets: {country: germany, remote: maybe}\n")
+            self.assertEqual(self.run_cli("validate", good).returncode, 0, self.run_cli("validate", good).stdout)
+            r = self.run_cli("validate", bad)
+        self.assertEqual(r.returncode, 1)
+        self.assertIn("targets.country", r.stdout)
+        self.assertIn("targets.remote", r.stdout)
+
     def test_validate_unknown_key_fails(self):
         with tempfile.TemporaryDirectory() as t:
             p = os.path.join(t, "bad.yaml")

@@ -34,7 +34,8 @@ DEFAULTS = {
         "start_file": "START_HERE.md", "todo_file": "TODO.md", "study_library": [],
     },
     "tracker": {"id_prefix": "VAC-", "decided_by_label": "DECIDED_BY_USER", "statuses": "default"},
-    "targets": {"roles": [], "roles_selective": [], "roles_not_primary": [], "domains_priority": [], "formats": []},
+    "targets": {"roles": [], "roles_selective": [], "roles_not_primary": [], "domains_priority": [], "formats": [],
+                "country": "any", "remote": "any"},
     "blockers": [],
     "match_weights": {"must_have": 60, "nice_to_have": 10, "seniority": 10, "domain": 10, "format_salary": 10},
     "thresholds": {"apply": 80, "decline": 65},
@@ -266,6 +267,19 @@ def data_path(cfg, data_dir, key):
     return os.path.join(data_dir, cfg["paths"][key])
 
 
+# keys whose value must be one of a fixed set (the vacancy location filter of /rank)
+CHOICES = {("targets", "country"): ("any", "ukraine", "not_ukraine"), ("targets", "remote"): ("any", "yes", "no")}
+
+
+def bad_choices(user):
+    out = []
+    for (sec, key), allowed in CHOICES.items():
+        val = (user.get(sec) or {}).get(key) if isinstance(user.get(sec), dict) else None
+        if val is not None and val not in allowed:
+            out.append(f"{sec}.{key} = {val!r} (allowed: {', '.join(allowed)})")
+    return out
+
+
 def unknown_keys(user, schema, prefix=""):
     """Dotted paths of mapping keys absent from the schema. Lists and free-form values are not checked."""
     bad = []
@@ -315,6 +329,10 @@ def main(argv, env=None, cwd=None):
     bad = unknown_keys(user, DEFAULTS)
     if bad:
         print("unknown config keys: " + ", ".join(bad))
+        return 1
+    bad = bad_choices(user or {})
+    if bad:
+        print("invalid config values: " + "; ".join(bad))
         return 1
     print(f"OK: {path}")
     return 0

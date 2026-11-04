@@ -28,7 +28,14 @@ paths:                  # relative to the data folder
 
 tracker: {id_prefix: "VAC-", decided_by_label: "DECIDED_BY_USER", statuses: default}
 
-targets: {roles: [], roles_selective: [], roles_not_primary: [], domains_priority: [], formats: []}
+targets:
+  roles: []
+  roles_selective: []
+  roles_not_primary: []
+  domains_priority: []
+  formats: []
+  country: any          # vacancy location filter for /rank: any | ukraine | not_ukraine
+  remote: any           # any | yes (fully remote only) | no (office or hybrid only)
 
 # Typed blockers; severity hard|soft (soft = flag and ask, never auto-reject). Example items:
 #   - {type: salary_min_net, value: 0, currency: USD, severity: hard}
