@@ -1,6 +1,6 @@
 # Alternative flow
 
-Source: design spec section 6.7, copied verbatim.
+Source: design spec section 6.7, copied verbatim. A1 is detailed in the approved addendum `docs/superpowers/specs/2026-11-04-portal-scanner-addendum.md` (not built yet).
 
 ## 6.7 Alternative flow (opt-in, off by default, later phases)
 Owner's decision 2026-10-27: the three career-ops features below are kept, but outside the main `/rank -> /apply` cycle. Each is a separate later phase (after the core plugin ships), switched on per user in config (`alt_flow.<feature>.enabled: false` by default), and each phase starts only after its own owner approval of a short design addendum. None of them may weaken the hard rules in section 10.

@@ -205,7 +205,7 @@ File `paths.story_bank`. Each story: id, title, Situation, Task, Action, Result 
 ### 6.7 Alternative flow (opt-in, off by default, later phases)
 Owner's decision 2026-10-27: the three career-ops features below are kept, but outside the main `/rank -> /apply` cycle. Each is a separate later phase (after the core plugin ships), switched on per user in config (`alt_flow.<feature>.enabled: false` by default), and each phase starts only after its own owner approval of a short design addendum. None of them may weaken the hard rules in section 10.
 
-**A1. Portal auto-scanner.**
+**A1. Portal auto-scanner.** Detailed in the approved addendum `2026-11-04-portal-scanner-addendum.md` (command `/jobsearch:scan`).
 - Allowed per site only: `robots_check.py` result AND a ToS read are recorded in the data dir (`portals.scan_approved: [{host, robots: ALLOWED, tos_checked: <date>, approved_by_user: <date>}]`); a host without that record is never scanned. In the owner's workspace automatic scraping is currently forbidden by his own rules, so each site needs his explicit approval first.
 - Fetches only listing/search pages of approved hosts at a polite rate; vacancy pages are untrusted data; no link inside a vacancy body is followed.
 - Output is a candidate list fed into `/rank` (duplicate check, blockers, legitimacy). Never straight to `/apply`, never to applying.
