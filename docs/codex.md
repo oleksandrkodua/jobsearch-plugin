@@ -45,7 +45,7 @@ The conservative behavior was explicitly selected for this edition. There are no
 2. In a disposable synthetic data folder, try a direct patch of `tracker/vacancies.csv`: it must be denied. Try editing a harmless draft under applications/: it should proceed. Do not use real applications for this check.
 3. Run the privacy preflight with the synthetic identity email: it must exit 1 and print DENIED. A generic job query must exit 0. A changed query needs another preflight.
 
-Automated adapter/package tests cover these behaviors. A fresh live Claude/Codex installation, trust UI and full interactive onboarding still require a user-visible live check.
+[Live smoke checks](audit-2026-11-04.md#follow-up-verification) covered these behaviors with synthetic data at `d57712e`. Repeat the checks after updating the installed package and reviewing hook trust. Full first-time onboarding remains outside the verified scope.
 
 Official references checked 2026-11-04: [plugin packaging](https://developers.openai.com/plugins/build/plugins), [Claude plugin conversion](https://developers.openai.com/plugins/guides/submit-claude-plugin), [Codex hooks and limitations](https://learn.chatgpt.com/docs/hooks).
 
