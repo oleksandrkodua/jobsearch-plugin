@@ -66,6 +66,8 @@ def main(stdin=None, env=None, argv=None):
                           or not egress.configured(data.get("cwd") or os.getcwd(), env)):
             raise ValueError("preflight requires a configured data folder and WebSearch/WebFetch")
         result = decide(data, env)
+    except datadir.DataDirError as exc:
+        result = ("deny", f"Jobsearch data-folder configuration error: {exc} The action was not approved.")
     except Exception:
         result = ("deny", "Codex jobsearch guard could not check this action; it was not approved. Fix configuration/input and retry.")
     if result and result[0] == "ask":

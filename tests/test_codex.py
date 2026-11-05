@@ -125,6 +125,18 @@ class CodexPackage(unittest.TestCase):
             result = self.run_script("hooks/codex_guard.py", data=event, configured=True)
             self.assertEqual(json.loads(result.stdout)["hookSpecificOutput"]["permissionDecision"], "deny")
 
+    def test_invalid_marker_denies_with_actionable_reason(self):
+        with tempfile.TemporaryDirectory() as cwd:
+            marker = Path(cwd) / ".jobsearch-data"
+            event = {"cwd": cwd, "tool_name": "Bash", "tool_input": {"command": "echo test"}}
+            for content in ("", "missing-folder"):
+                marker.write_text(content)
+                result = self.run_script("hooks/codex_guard.py", data=event, configured=False)
+                decision = json.loads(result.stdout)["hookSpecificOutput"]
+                self.assertEqual(decision["permissionDecision"], "deny")
+                self.assertIn("Marker file", decision["permissionDecisionReason"])
+                self.assertIn("not an existing folder", decision["permissionDecisionReason"])
+
     def test_patch_move_target_checked_and_full_batch_denied(self):
         event = {"cwd": str(FIXTURE), "tool_name": "apply_patch", "tool_input": {"command":
             "*** Begin Patch\n*** Update File: applications/draft.md\n*** Move to: tracker/vacancies.csv\n@@\n-x\n+y\n*** End Patch"}}
