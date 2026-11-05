@@ -1,6 +1,7 @@
 # Changelog
 
 ## 1.0.0 (unreleased)
+- SessionStart reports missing overview and TODO files accurately. Grounding audit checks approved durations in days, including the full before-and-after claim.
 - Pre-release architecture audit: fixed YAML description/argument-hint scalars and portable Codex helper metadata; added independent format checks.
 - Closed reproduced guard gaps: network option variants/recipients, git push URL rewrites, explicit connector HTTP actions, protected directory removal and download targets, dangling CV symlinks, and native workdir scope changes. Direct tracker/final CV writes through supported Bash/MCP paths now deny, while copy-out stays allowed.
 - Setup readiness includes identity and chat language; new setup binds its config explicitly; ATS helper honors English-CV/privacy rules and reports unavailable technical scores honestly. Scanner role matching retains short tokens such as QA. Codex build rejects recursive output locations.

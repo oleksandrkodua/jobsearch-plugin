@@ -151,6 +151,19 @@ class AuditCase(unittest.TestCase):
         self.assertTrue(has(run(base.replace("Outside work", "I cut bugs by 55%. Outside work"))[0], "numeric claim not in master: «55%»"))
         self.assertEqual(run(base.replace("Outside work", "I cut bugs by 40%. Outside work"))[0], [])
 
+    def test_day_metrics_require_the_exact_approved_claim(self):
+        cfg = copy.deepcopy(CFG)
+        cfg["honesty"]["allowed_numbers"] += ["10 days to 5 days", "3 дні"]
+        base = letter("clean")
+        for approved in ("10 days to 5 days", "3 дні"):
+            with self.subTest(approved=approved):
+                text = base.replace("Outside work", f"Regression time: {approved}. Outside work")
+                self.assertEqual(run(text, cfg=cfg)[0], [])
+        for unsupported in ("10 days to 1 day", "10 to 5 days", "5 days", "2 дні"):
+            with self.subTest(unsupported=unsupported):
+                text = base.replace("Outside work", f"Regression time: {unsupported}. Outside work")
+                self.assertTrue(has(run(text, cfg=cfg)[0], f"numeric claim not in master: «{unsupported}»"))
+
     def test_signature_lines_excluded_from_word_count(self):
         # 147 body words fail only when the sign-off (4 words) is excluded, as configured
         t = sized(147)

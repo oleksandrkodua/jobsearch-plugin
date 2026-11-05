@@ -111,7 +111,10 @@ def context(project_root, env, source=None):
     except (datadir.DataDirError, ValueError, OSError):
         return None
     start_rel, todo_rel = cfg["paths"]["start_file"], cfg["paths"]["todo_file"]
+    start = _read(datadir.data_path(cfg, d, "start_file"), start_rel)
     todo = _read(datadir.data_path(cfg, d, "todo_file"), todo_rel)
+    start_missing = start == f"(missing: {start_rel})"
+    todo_missing = todo == f"(missing: {todo_rel})"
     open_items = [l for l in todo.splitlines() if re.match(r"\s*- \[ \]", l)]
     lang = cfg["language"].get("chat")
     overview = source in OVERVIEW_SOURCES
@@ -121,8 +124,8 @@ def context(project_root, env, source=None):
             + "Show the overview below, then the open to-do items, and ask which to take.")
     if lang:
         text += f" Always answer in {lang}."
-    text += (f"\n\n===== {start_rel} =====\n" + _read(datadir.data_path(cfg, d, "start_file"), start_rel)
-             + f"\n\n===== {todo_rel} open items ({len(open_items)}) =====\n" + "\n".join(open_items[:MAX_OPEN_ITEMS] or ([todo] if todo.startswith("(missing:") else [])))
+    text += (f"\n\n===== {start_rel} =====\n" + start
+             + f"\n\n===== {todo_rel} open items ({len(open_items)}) =====\n" + "\n".join(open_items[:MAX_OPEN_ITEMS] or ([todo] if todo_missing else [])))
     if len(open_items) > MAX_OPEN_ITEMS:
         text += f"\n... and {len(open_items) - MAX_OPEN_ITEMS} more open items in {todo_rel}"
     missing = onboarding.missing_steps(cfg, d)
@@ -130,8 +133,10 @@ def context(project_root, env, source=None):
         text += "\n\n" + onboarding.status(cfg, d)
     if overview:
         text += "\n\n===== jobsearch commands and skills =====\n" + capabilities()
+    start_status = "missing" if start_missing else "loaded"
+    todo_status = "missing" if todo_missing else f"loaded ({len(open_items)} open items)"
     return {
-        "systemMessage": f"jobsearch: {start_rel} and {todo_rel} loaded ({len(open_items)} open items).",
+        "systemMessage": f"jobsearch: {start_rel} {start_status}. {todo_rel} {todo_status}.",
         "hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": runtime.render_text(text)},
     }
 

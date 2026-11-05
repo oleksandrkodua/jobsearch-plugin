@@ -143,13 +143,21 @@ def audit(text, kind, cfg, master_text, no_length=False, allowed_extra=frozenset
     # 7 numbers with units that look like claims
     ok_years = {str(c["n"]) for c in year_claims}
     notes = "; ".join(str(c["note"]) for c in year_claims if c.get("note"))
-    for m in re.finditer(r"\b(\d+)\+?\s*(years?|%|x\b|days?|bugs?|defects?)", text, re.I):
+    for m in re.finditer(r"\b(\d+)\+?\s*(years?|%|x\b|bugs?|defects?)", text, re.I):
         n, unit = m.group(1), m.group(2).lower()
         if unit.startswith("year") and n in ok_years:
             warns.append(f"«{m.group(0)}»: years claim, confirm against {facts}" + (f" ({notes})" if notes else ""))
         elif unit.startswith("year") or unit in ("%", "x") or unit.startswith(("bug", "defect")):
             if m.group(0).replace(" ", "").lower() in allowed_numbers:
                 continue
+            fails.append(f"numeric claim not in master: «{m.group(0)}»")
+    # Match day-to-day comparisons as a whole, so approving one comparison
+    # does not approve its endpoints in different comparisons.
+    amount = r"\d+(?:[.,]\d+)?"
+    day_unit = r"(?:days?|день|дні|днів)"
+    durations = rf"\b(?:{amount}(?:\s*{day_unit})?\s+(?:to|до)\s+)?{amount}\s*{day_unit}\b"
+    for m in re.finditer(durations, text, re.I):
+        if m.group(0).replace(" ", "").lower() not in allowed_numbers:
             fails.append(f"numeric claim not in master: «{m.group(0)}»")
     # 8 letter length (greeting and signature lines are not counted)
     if kind == "letter" and not no_length:

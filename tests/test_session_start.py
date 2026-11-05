@@ -91,9 +91,16 @@ class ContextCase(unittest.TestCase):
     def test_missing_files_reported(self):
         d = self.data_dir(start=False)
         os.remove(os.path.join(d, "TODO.md"))
-        ctx = session_start.context(d, {})["hookSpecificOutput"]["additionalContext"]
+        out = session_start.context(d, {})
+        ctx = out["hookSpecificOutput"]["additionalContext"]
         self.assertIn("(missing: START_HERE.md)", ctx)
         self.assertIn("(missing: TODO.md)", ctx)
+        self.assertEqual(out["systemMessage"], "jobsearch: START_HERE.md missing. TODO.md missing.")
+        write(os.path.join(d, "TODO.md"), "- [ ] one\n")
+        self.assertEqual(
+            session_start.context(d, {})["systemMessage"],
+            "jobsearch: START_HERE.md missing. TODO.md loaded (1 open items).",
+        )
 
     def test_bad_config_is_silent(self):
         d = self.data_dir()
