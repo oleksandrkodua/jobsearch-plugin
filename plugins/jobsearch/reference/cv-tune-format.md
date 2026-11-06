@@ -22,6 +22,8 @@ Status in CV comes from Stage 2 ATS Keyword Alignment. The Action column takes o
 ## 3. Feedback per section
 Summary, Skills, Experience (and Education or Certifications only if the vacancy asks). Each section has four short lists: **Fits**, **Weak or generic**, **Change**, **Do not add**.
 
+When proposing a cut from Summary, name the section where the same fact remains or flag that it would disappear from the CV. Mark whole-CV retention NOT VERIFIED if the before-and-after content is incomplete.
+
 ## 4. Rewritten bullets
 One block per bullet:
 ```
@@ -47,7 +49,11 @@ The `grounding_audit.py --kind cv` result on `cv_tune_bullets.md` (recorded in `
    - no hidden or white text;
    - no vacancy sentences copied verbatim.
 2. **No skills or tools without evidence.** The Skills section may only reorder or surface items in the master skills list. A vacancy tool missing from the master is `do not add (no evidence)`, even if it is in `honesty.tool_dictionary`.
-3. **No invented metrics, titles, dates, scope or seniority.** Numbers come only from `honesty.allowed_numbers`. Depth is never upgraded: a Partial in the matrix stays Partial in the wording.
+3. **No invented metrics, titles, dates, scope or seniority.** Numbers come only from `honesty.allowed_numbers`. Depth is never upgraded: a Partial in the matrix stays Partial in the wording. Attribute individual actions and team outcomes separately.
 4. **Inputs are read-only.** The final CV files and the master CV are never written.
 5. **Nothing is sent or uploaded.**
 6. **Conflicts are asked, not resolved.** If the final CV and the master disagree on a date, title or employer, list the conflict and ask the user.
+
+## Requested layout preview
+
+For a requested CV layout preview, compare the proposed content against the supplied baseline and flag changes outside the agreed scope. For each layout in scope, compare the actual baseline and preview page counts and check the preview against the user-approved page limit. Report each layout separately. Mark checks NOT VERIFIED when the baseline, approved limit or rendered layout is unavailable. Get confirmation before generating a PDF and use a separate draft path.

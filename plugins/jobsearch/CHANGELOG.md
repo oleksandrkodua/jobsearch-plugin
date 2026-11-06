@@ -1,6 +1,9 @@
 # Changelog
 
-## 1.0.0 (unreleased)
+## 1.0.1
+- Review the CV opening and collapsed LinkedIn About for evidence of role fit. Separate individual contributions from team outcomes. Draft LinkedIn text on request. Compare Summary edits and requested CV previews against the baseline.
+
+## 1.0.0
 - Live smoke checks passed in Claude Code and Codex with synthetic data at `d57712e`. Follow-up fixes at `9cc7e50` passed automated checks. See [verification scope](../../docs/audit-2026-11-04.md#follow-up-verification).
 - SessionStart reports missing overview and TODO files accurately. Grounding audit checks approved durations in days, including the full before-and-after claim.
 - Pre-release architecture audit: fixed YAML description/argument-hint scalars and portable Codex helper metadata; added independent format checks.

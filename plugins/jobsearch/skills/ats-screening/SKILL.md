@@ -45,6 +45,8 @@ Never round up to a higher level "because it's probably true" — the whole exer
 
 **Quantified impact is scored separately from responsibilities.** A bullet describing a responsibility ("owned regression suite") is not the same as a bullet describing an outcome ("cut regression cycle from 5 days to 1"). Look for percentages, time/defect reduction, performance gains, scale, cost savings, coverage, team size, or other measurable results. Don't penalize a candidate simply for lacking metrics — but do note that the *absence* of measurable outcomes is itself informative when the claimed seniority or role would normally produce them.
 
+**Attribution.** Separate what the candidate did from what the team achieved. Credit a team outcome as context unless the CV supports attributing it to the candidate.
+
 **Career trajectory.** Assess progression, tenure, continuity, gaps, and consistency of seniority claims — without speculating about *why* a gap or change happened. If the CV doesn't explain it, the answer is "Reason: Not stated," full stop, not a guess about parental leave, layoffs, etc.
 
 **Internal consistency.** Cross-check the Summary against Experience, Skills, dates, titles, and claimed years of experience. Flag contradictions explicitly rather than quietly resolving them in the candidate's favor.
@@ -113,6 +115,8 @@ Evaluate these dimensions:
 **D. Career trajectory** — progression, tenure, stability, increasing scope, role consistency, unexplained gaps, contradictions.
 
 **E. Application signal-to-noise** — specificity vs. vague/generic/repetitive claims, evidence density, internal consistency, technical credibility of the language used (does it sound like someone who actually did the work, or boilerplate?).
+
+For candidate-facing content reviews, check whether the first screen shows the target role (if known) and one relevant contribution with a supported outcome or scope. Without a rendered view, assess the opening and mark screen visibility NOT VERIFIED. Keep this qualitative and separate from the ATS Technical Score.
 
 **F. ATS technical quality — only when you have the actual file, not just pasted text.** For a PDF, run both `ats_technical_score.py` (prints `ATS Technical Score: XX/100` with a 15-check table, top fixes and unscored advisories) and `pdf_technical_check.py` (see "Using the PDF scripts" below). Always show the score with its breakdown, never a bare number. Then report on: genuine text layer / extraction quality, logical reading order, two-column parsing risk, hidden or duplicate text, encoding artifacts / broken hyphenation, hyperlinks, page count and clipping/overflow. Two important calibration points:
 - Don't require a two-column CV to become single-column just to please one parser. If the PDF's structure is technically sound but a coordinate-based (non-semantic) extractor might still interleave columns, say so explicitly and separate "PDF is structurally correct" from "risk with certain parser types" — these are different findings and shouldn't be conflated into a blanket "bad ATS formatting" verdict.
