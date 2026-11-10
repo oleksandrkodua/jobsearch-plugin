@@ -30,11 +30,13 @@ class GuardCase(unittest.TestCase):
                     "cv/final_cv.pdf"):
             write(os.path.join(self.dd, rel))
         self.env = {"JOBSEARCH_DATA_DIR": self.dd}
-        self.proj = os.path.join(self.base, "project")
+        self.proj = os.path.join(self.base, "project")  # an unrelated project: the guard is not active here
         os.makedirs(self.proj)
+        self.work = os.path.join(self.dd, "work")  # inside the data folder: the job-search project
+        os.makedirs(self.work)
 
     def decide(self, tool, tool_input, cwd=None, env=None):
-        return guard_writes.decide(tool, tool_input, cwd or self.proj, self.env if env is None else env)
+        return guard_writes.decide(tool, tool_input, cwd or self.work, self.env if env is None else env)
 
     def path(self, rel):
         return os.path.join(self.dd, rel)
@@ -77,7 +79,7 @@ class WriteTools(GuardCase):
         self.assertEqual(self.decide("NotebookEdit", {"notebook_path": self.path("cv/final_cv.pdf")})[0], "deny")
 
     def test_no_data_dir_means_no_opinion(self):
-        self.assertIsNone(self.decide("Write", {"file_path": self.path("tracker/vacancies.csv")}, env={}))
+        self.assertIsNone(self.decide("Write", {"file_path": self.path("tracker/vacancies.csv")}, cwd=self.proj, env={}))
 
     def test_unknown_tool_ignored(self):
         self.assertIsNone(self.decide("Read", {"file_path": self.path("tracker/vacancies.csv")}))

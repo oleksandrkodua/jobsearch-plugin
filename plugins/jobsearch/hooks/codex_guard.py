@@ -28,7 +28,7 @@ def decide(data, env):
     if egress.configured(cwd, env):
         data_dir = os.path.abspath(datadir.resolve_data_dir(cwd, env))
         config = os.path.abspath(datadir.config_path(data_dir, env))
-        env = {**env, datadir.ENV_DIR: data_dir, datadir.ENV_CONFIG: config}
+        env = {**env, datadir.ENV_DIR: data_dir, datadir.ENV_CONFIG: config, egress.SCOPE_KEY: "1"}
     tool = data.get("tool_name")
     ti = data.get("tool_input") or {}
     if not isinstance(ti, dict):

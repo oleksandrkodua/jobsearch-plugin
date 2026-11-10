@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.2
+- Scope: the PreToolUse guard (and the Codex adapter) now applies only inside the job-search project: the working directory is in the data folder, or the project holds the `.jobsearch-data` marker or a config file. Setting `JOBSEARCH_DATA_DIR` or `JOBSEARCH_CONFIG` globally no longer activates the connector, search, shell-egress and browser rules in unrelated projects. Direct writes to the tracker, final CV files, master CV and facts file stay guarded wherever the data folder resolves. SessionStart was already limited to the job-search project.
+
 ## 1.0.1
 - Review the CV opening and collapsed LinkedIn About for evidence of role fit. Separate individual contributions from team outcomes. Draft LinkedIn text on request. Compare Summary edits and requested CV previews against the baseline.
 

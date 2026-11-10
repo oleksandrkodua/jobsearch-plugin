@@ -32,9 +32,19 @@ ASK = ("Approved destination. Confirmation 2: approve this specific outbound wri
        "Applications and messages remain drafts; the user sends them (hard rule 1).")
 
 
+SCOPE_KEY = "JOBSEARCH_GUARD_SCOPE"  # set by codex_guard after it resolved the session scope
+
+
 def configured(cwd, env):
-    return bool(env.get(datadir.ENV_DIR) or env.get(datadir.ENV_CONFIG)
-                or datadir.project_root(cwd) is not None)
+    """True only inside the job-search project: cwd is in the data folder, or the project holds the
+    marker/config file. The env vars alone do not activate the guard in unrelated projects."""
+    if env.get(SCOPE_KEY) == "1" or datadir.project_root(cwd) is not None:
+        return True
+    d = env.get(datadir.ENV_DIR)
+    if not d:
+        return False
+    here, root = os.path.realpath(cwd), os.path.realpath(os.path.expanduser(d))
+    return here == root or here.startswith(root + os.sep)
 
 
 def _git(cwd, *args):

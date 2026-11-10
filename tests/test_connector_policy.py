@@ -58,7 +58,7 @@ class ConnectorPolicy(GuardCase):
             self.assertEqual(self.decide(tool, ti, cwd=self.dd)[0], 'deny')
 
     def test_unknown_connector_fails_closed_on_check_error(self):
-        data = json.dumps({'cwd': self.proj, 'tool_name': 'mcp__service__mystery', 'tool_input': {}})
+        data = json.dumps({'cwd': self.work, 'tool_name': 'mcp__service__mystery', 'tool_input': {}})
         out = io.StringIO()
         with patch.object(guard_writes, 'decide', side_effect=RuntimeError('failure')), contextlib.redirect_stdout(out):
             guard_writes.main(io.StringIO(data), self.env)
@@ -76,4 +76,4 @@ class ConnectorPolicy(GuardCase):
 
     def test_unconfigured_projects_unaffected(self):
         for tool in ('mcp__gmail__send_message', 'mcp__artifact_session__js'):
-            self.assertIsNone(self.decide(tool, {}, env={}))
+            self.assertIsNone(self.decide(tool, {}, cwd=self.proj, env={}))
