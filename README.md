@@ -48,7 +48,7 @@ Both approved addenda are shipped: CV tailoring (`/apply tune`) and the career p
 
 ## Architecture map
 
-![Jobsearch plugin architecture map: 12 largest non-test communities of 100, sized by node count](docs/graph/overview.svg)
+![Jobsearch plugin architecture map: 12 largest non-test communities of 100, sized by node count](docs/graph/overview-12.svg)
 
 Generated with [graphify](https://pypi.org/project/graphifyy/) from the repository itself: 1532 nodes, 3104 edges, 100 communities (the 12 largest non-test communities are shown). Blue: scripts and guards, orange: commands, skills and docs. Lines between circles show how many graph edges connect two communities. Download [graph.html](docs/graph/graph.html) and open it locally for the full interactive graph.
 
