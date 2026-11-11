@@ -23,6 +23,12 @@ In Claude Code, the workflow uses 10 slash commands, called as `/jobsearch:<name
 | `jobsearch-setup` | Guided setup: language (UK/EN), targets, limits, English CV, confirmed facts/master, metrics, ATS read, base letters and approved links. New/empty skeleton only; `update` reviews an existing folder and changes selected answers after confirmation. | First run, once. |
 | `help` | Shows every command (with its modes) and skill in one line each, the usual workflow and whether a data folder is set up. Works in any project, also before setup. Changes nothing. | You are new to the plugin, or forgot which command does what. |
 
+### The path of a vacancy
+
+![The path of one vacancy through the plugin: scan, rank, apply, you send by hand, outcome, followup, funnel; skipped vacancies stay on file. All counts are synthetic.](docs/img/vacancy-path.svg)
+
+One vacancy goes through six commands. The red postbox is the only step the plugin never does: you send the application yourself. The counts in the picture are made up (synthetic data). `help`, `jobsearch-setup`, `interview` and `upskill` are not steps of one vacancy and are left out on purpose. Download [vacancy-path.html](docs/img/vacancy-path.html) and open it locally to touch each station. Drawn with [Minicharts](https://april-zhu.com/minicharts) by April Zhu; rebuild with `python3 tools/build_vacancy_path.py` (needs node and a local Minicharts copy, neither is a plugin dependency). `tests/test_vacancy_path.py` fails when the commands and the picture drift apart.
+
 ### Skills
 
 | Skill | What it does | Not for |

@@ -1,0 +1,11 @@
+{
+  "chart_id": "jsflow",
+  "steps": ["scan", "rank", "apply", "outcome", "followup", "funnel"],
+  "manual_step": "you send",
+  "not_in_chart": {
+    "help": "an overview of the commands, not a step a vacancy passes through",
+    "jobsearch-setup": "one-time setup before any vacancy",
+    "interview": "a side branch for one tracked application, after a reply",
+    "upskill": "a learning plan built from many outcomes, not a step of one vacancy"
+  }
+}
