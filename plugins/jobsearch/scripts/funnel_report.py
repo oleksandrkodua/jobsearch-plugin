@@ -9,7 +9,8 @@ from applied_date to the first reply (a CHANGELOG change to REJECTED/ACTIVE or a
 A reply note mentions a reply or response with no negation (no / not / never / n't / without / awaiting /
 waiting) up to 4 words before it in the same clause; an auto-reply is not a reply. A group with fewer
 than 5 applications is marked "too few to conclude". Writes <paths.reports>/funnel_<date>.md (creates only that
-folder) and prints it. Never overwrites: an existing report gets a _2, _3 ... suffix. Refuses any --out equal to the
+folder) and prints it. Optional notes tags reply:fast (on REJECTED) and reply:silence (on NO_RESPONSE) get their
+own table; the same too-few rule applies. Never overwrites: an existing report gets a _2, _3 ... suffix. Refuses any --out equal to the
 tracker or CHANGELOG.csv, or inside the tracker's history/ folder (exit 1).
 """
 import argparse, collections, csv, datetime, os, re, statistics, sys
@@ -26,6 +27,8 @@ NEGATIONS = {"no", "not", "never", "without", "awaiting", "waiting"}
 NEG_WINDOW = 4  # a negation this many words (or fewer) before the reply word, in the same clause
 AUTO_REPLY_RE = re.compile(r"\b(auto|automatic|automated)[\s-]*repl(y|ies)\b", re.I)
 GAP_RE = re.compile(r"\bgap:([\w.+#-]+)", re.I)
+SPEED_RE = re.compile(r"\breply:(fast|silence)\b", re.I)
+SPEED_STATUS = {"fast": "REJECTED", "silence": "NO_RESPONSE"}  # a speed tag counts only on its own status
 TOO_FEW = "too few to conclude"
 
 
@@ -100,7 +103,7 @@ def _is_applied(r):
 
 def is_reply_note(note):
     """A note reports a reply when a reply word has no negation within NEG_WINDOW words before it in its clause."""
-    note = AUTO_REPLY_RE.sub(" ", note or "")
+    note = SPEED_RE.sub(" ", AUTO_REPLY_RE.sub(" ", note or ""))  # a reply:fast / reply:silence tag is not a reply word
     for m in REPLY_RE.finditer(note):
         clause = re.split(r"[.,;:!?()\n]", note[:m.start()])[-1]
         words = re.findall(r"[\w'\u2019]+", clause.lower())[-NEG_WINDOW:]
@@ -196,6 +199,23 @@ def build_report(rows, changelog, cfg, today):
             L.append(f"\nOnly {len(rej_rows)} rejected rows: {TOO_FEW}.")
     else:
         L.append(f"none tagged ({len(rej_rows)} rejected rows; tag a gap in the notes as gap:<tag>)")
+    L += ["", "## Reply speed tags", ""]
+    groups = {"REJECTED": rej_rows, "NO_RESPONSE": [r for r in rows if r.get("status") == "NO_RESPONSE"]}
+    tagged = collections.defaultdict(set)
+    for r in rows:
+        text = " ".join(r.get(k, "") or "" for k in ("notes_csv", "notes_xlsx"))
+        for t in SPEED_RE.findall(text):
+            tagged[t.lower()].add(r.get("id", ""))
+    L += ["| tag | status | tagged rows | of rows with that status | note |", "|---|---|---|---|---|"]
+    for tag, status in SPEED_STATUS.items():
+        grp = groups[status]
+        k = sum(1 for r in grp if r.get("id", "") in tagged[tag])
+        L.append(f"| reply:{tag} | {status} | {k} | {len(grp)} | {TOO_FEW if len(grp) < MIN_N else ''} |"
+                 .replace("|  |", "| |"))
+    ids = {s: {r.get("id", "") for r in g} for s, g in groups.items()}
+    stray = sum(len(tagged[t] - ids[s]) for t, s in SPEED_STATUS.items())
+    if stray:
+        L.append(f"\n{stray} tagged row(s) ignored: reply:fast counts only on REJECTED, reply:silence only on NO_RESPONSE.")
     L += ["", "## Timing", "", f"Median days to first reply: {_median_days(rows, changelog)}", ""]
     return "\n".join(L)
 

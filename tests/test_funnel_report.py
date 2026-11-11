@@ -219,6 +219,39 @@ class FunnelCase(unittest.TestCase):
         self.assertIn("Median days to first reply: n/a", out)
         self.assertIn("-> any reply 0 ", out)
 
+    # ---- reply speed tags (synthetic rows only)
+    def test_reply_speed_table_counts_and_too_few(self):
+        rows = [mk(i, "REJECTED", notes="reply:fast gap:x" if i <= 2 else "") for i in range(1, 6)]
+        rows += [mk(10, "NO_RESPONSE", notes="reply:silence"), mk(11, "NO_RESPONSE")]
+        out = self.report(rows, [])
+        self.assertIn("## Reply speed tags", out)
+        self.assertIn("| reply:fast | REJECTED | 2 | 5 | |", out)  # 5 rows: no too-few mark
+        self.assertIn("| reply:silence | NO_RESPONSE | 1 | 2 | too few to conclude |", out)
+        self.assertNotIn("ignored", out)
+
+    def test_reply_speed_table_without_tags_shows_zero(self):
+        out = self.report([mk(1, "REJECTED")], [])
+        self.assertIn("| reply:fast | REJECTED | 0 | 1 | too few to conclude |", out)
+        self.assertIn("| reply:silence | NO_RESPONSE | 0 | 0 | too few to conclude |", out)
+
+    def test_reply_speed_tag_on_wrong_status_is_ignored_and_said(self):
+        rows = [mk(1, "REJECTED", notes="reply:silence"), mk(2, "APPLIED", notes="reply:fast"),
+                mk(3, "NO_RESPONSE", notes="Reply:Silence")]
+        out = self.report(rows, [])
+        self.assertIn("| reply:fast | REJECTED | 0 | 1 | too few to conclude |", out)
+        self.assertIn("| reply:silence | NO_RESPONSE | 1 | 1 | too few to conclude |", out)
+        self.assertIn("2 tagged row(s) ignored", out)
+
+    def test_speed_tag_in_changelog_note_is_not_a_reply(self):
+        self.assertFalse(funnel_report.is_reply_note("no answer for weeks reply:silence"))
+        self.assertTrue(funnel_report.is_reply_note("reply:fast, recruiter replied same day"))
+        rows = [mk(1, "NO_RESPONSE", applied="2026-10-01")]
+        log = [{"timestamp": "20261020_100000_000001", "id": "VAC-001", "field": "status", "old": "APPLIED",
+                "new": "NO_RESPONSE", "note": "silence ruled by the owner reply:silence"}]
+        out = self.report(rows, log)
+        self.assertIn("-> any reply 0 ", out)
+        self.assertIn("Median days to first reply: n/a", out)
+
     # ---- item 3: never overwrite, never write into the tracker folder
     def run_main(self, *args):
         buf = io.StringIO()
