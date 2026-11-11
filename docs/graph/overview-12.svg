@@ -49,7 +49,6 @@
 <text x="349" y="235" font-size="21" text-anchor="end" fill="#1f2937">Tracker edit script (23)</text>
 <circle cx="475" cy="163" r="34" fill="#e08a1e" fill-opacity=".85"/>
 <text x="455" y="129" font-size="21" text-anchor="end" fill="#1f2937">Followup and outcome commands (23)</text>
-<circle cx="270.0" cy="732" r="9" fill="#2f6fed"/><text x="286.0" y="738" font-size="18" fill="#374151">code / scripts</text>
-<circle cx="520.0" cy="732" r="9" fill="#e08a1e"/><text x="536.0" y="738" font-size="18" fill="#374151">commands, skills, docs</text>
-<circle cx="770.0" cy="732" r="9" fill="#8b95a7"/><text x="786.0" y="738" font-size="18" fill="#374151">tests</text>
+<circle cx="390.0" cy="732" r="9" fill="#2f6fed"/><text x="406.0" y="738" font-size="18" fill="#374151">code / scripts</text>
+<circle cx="640.0" cy="732" r="9" fill="#e08a1e"/><text x="656.0" y="738" font-size="18" fill="#374151">commands, skills, docs</text>
 </svg>
