@@ -46,6 +46,12 @@ A PreToolUse write guard (`plugins/jobsearch/hooks/guard_writes.py`) enforces ha
 
 Both approved addenda are shipped: CV tailoring (`/apply tune`) and the career pack (`/upskill roadmap`, the data-dir mode of `linkedin-profile-optimizer`, `career-paths`). The portal scanner (Greenhouse and Lever) ships off by default. The next planned phases are an application-form assistant and email reply-watch; see `docs/alternative-flow.md`. Ideas set aside on purpose, with the evidence that would bring them back, are in `docs/deferred-ideas.md`.
 
+## Architecture map
+
+![Jobsearch plugin architecture map: 22 largest of 100 communities, sized by node count](docs/graph/overview.svg)
+
+Generated with [graphify](https://pypi.org/project/graphifyy/) from the repository itself: 1532 nodes, 3104 edges, 100 communities (top 22 shown). Blue: scripts and guards, orange: commands, skills and docs, grey: tests. Lines between circles show how many graph edges connect two communities. Download [graph.html](docs/graph/graph.html) and open it locally for the full interactive graph.
+
 ## Install in Claude Code
 
 ```
