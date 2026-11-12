@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+- `/jobsearch:funnel`: new "Reply speed tags" table. The optional note tags `reply:fast` (counted on REJECTED rows) and `reply:silence` (counted on NO_RESPONSE rows) are tallied separately; a group with fewer than 5 rows is marked "too few to conclude", and a tag on another status is ignored and reported. A `reply:*` token in a CHANGELOG note is no longer read as a reply word, so it cannot make a NO_RESPONSE row count as replied. The report stays read-only.
+
 ## 1.0.2
 - Scope: the PreToolUse guard (and the Codex adapter) now applies only inside the job-search project: the working directory is in the data folder, or the project holds the `.jobsearch-data` marker or a config file. Setting `JOBSEARCH_DATA_DIR` or `JOBSEARCH_CONFIG` globally no longer activates the connector, search, shell-egress and browser rules in unrelated projects. Direct writes to the tracker, final CV files, master CV and facts file stay guarded wherever the data folder resolves. SessionStart was already limited to the job-search project.
 

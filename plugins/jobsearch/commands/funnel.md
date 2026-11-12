@@ -13,6 +13,8 @@ Rules that never bend: this command never changes the tracker or the CHANGELOG. 
 
 Small-sample rule: a group with fewer than 5 applications is marked "too few to conclude". Report such a group as an observation only. Never draw a conclusion, a ranking or a recommendation from it, and say so in your summary.
 
+Reply speed tags: the report counts the optional note tags `reply:fast` (an answer came within hours, on a REJECTED row) and `reply:silence` (no answer for weeks, on a NO_RESPONSE row) in a separate table, with the same small-sample rule. A tag on another status is ignored and the report says so. The tags are the user's own words; never add or guess them, and never read a cause into them (a fast rejection is not proof of a form filter).
+
 If `portals.job_portals` is empty, the report says no row is classed as a job portal. Tell the user that; do not guess portals for them.
 
 After the report, give the user a short read-out (what the funnel shows, which groups are too small to judge) and suggest at most 3 concrete actions, each tied to a number in the report that is not marked "too few to conclude" (for example: tag gaps in the notes as `gap:<tag>` so rejection reasons become visible; favour the host class or role type with a clearly higher reply rate; follow up on applications with no reply). If no group is large enough, suggest only how to collect more data. Do not change statuses; if the user wants a change, use `tracker_edit.py` on their request.
