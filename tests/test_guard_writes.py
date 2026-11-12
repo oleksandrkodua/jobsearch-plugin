@@ -110,6 +110,42 @@ class BashTool(GuardCase):
     def test_unrelated_write_allowed(self):
         self.assertIsNone(self.decide("Bash", {"command": "echo hi > reports/out.md"}))
 
+    def test_real_rsync_from_or_into_the_data_folder_is_denied(self):
+        dst = os.path.join(self.proj, "copy")
+        for cmd in (f"rsync -a {self.dd}/ {dst}/",
+                    f"rsync -avz --delete --info=progress2 {self.dd}/ {dst}/",
+                    f"rsync -a --exclude=n {self.dd}/ {dst}/",
+                    f"rsync -a {dst}/ {self.dd}/tracker/"):
+            decision, _ = self.decide("Bash", {"command": cmd}, cwd=self.dd)
+            self.assertEqual(decision, "deny", cmd)
+
+    def test_rsync_dry_run_and_list_only_are_reads(self):
+        dst = os.path.join(self.proj, "copy")
+        for cmd in (f"rsync -n -a {self.dd}/ {dst}/",
+                    f"rsync --dry-run -a --delete {self.dd}/ {dst}/",
+                    f"rsync -rcn --delete --itemize-changes {self.dd}/ {dst}/",
+                    f"rsync -avn {self.dd}/ {dst}/",
+                    f"rsync --list-only {self.dd}/"):
+            self.assertIsNone(self.decide("Bash", {"command": cmd}, cwd=self.dd), cmd)
+
+    def test_rsync_dry_run_with_batch_or_log_file_is_still_a_write(self):
+        dst = os.path.join(self.proj, "copy")
+        for cmd in (f"rsync -n --write-batch=/tmp/b {self.dd}/ {dst}/",
+                    f"rsync --dry-run --log-file=/tmp/l {self.dd}/ {dst}/"):
+            decision, _ = self.decide("Bash", {"command": cmd}, cwd=self.dd)
+            self.assertEqual(decision, "deny", cmd)
+
+    def test_dry_run_flag_does_not_excuse_a_second_real_command(self):
+        dst = os.path.join(self.proj, "copy")
+        cmd = f"rsync -n -a {self.dd}/ {dst}/ && rsync -a {self.dd}/ {dst}/"
+        decision, _ = self.decide("Bash", {"command": cmd}, cwd=self.dd)
+        self.assertEqual(decision, "deny")
+
+    def test_rsync_dry_run_redirect_into_tracker_is_still_denied(self):
+        cmd = f"rsync -n -a {self.dd}/ {self.proj}/copy/ > {self.path('tracker/vacancies.csv')}"
+        decision, _ = self.decide("Bash", {"command": cmd}, cwd=self.dd)
+        self.assertEqual(decision, "deny")
+
 
 class OutreachTools(GuardCase):
     def in_project(self, tool, tool_input):

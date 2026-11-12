@@ -118,6 +118,14 @@ def file_decision(tool, path, cwd, entries, ancestors=False):
     return _verdict(hits[0][1]) if hits else None
 
 
+def rsync_read_only(words):
+    """A dry run (-n, --dry-run, a short cluster such as -rcn) or --list-only never writes, unless a batch or log file is asked for."""
+    flags = [w for w in words[1:] if w.startswith("-")]
+    dry = any(w in ("--dry-run", "--list-only") or (not w.startswith("--") and "n" in w[1:]) for w in flags)
+    writes = any(w.startswith(("--write-batch", "--only-write-batch", "--log-file")) for w in flags)
+    return dry and not writes
+
+
 def bash_file_decisions(command, cwd, entries):
     results = []
     for words in egress.segments(command):
@@ -146,6 +154,7 @@ def bash_file_decisions(command, cwd, entries):
         mutator = (exe in ("cp", "mv", "rm", "unlink", "rmdir", "truncate", "dd", "install", "rsync", "tee")
                    or (exe == "sed" and any(w.startswith("-i") for w in words[1:]))
                    or (exe == "perl" and any(w.startswith("-") and "i" in w for w in words[1:])))
+        mutator = mutator and not (exe == "rsync" and rsync_read_only(words))
         targets = args if mutator else []
         if exe in ("cp", "install") and args:
             targets = [args[-1]]  # the protected input is read, not changed
