@@ -10,6 +10,10 @@ The data-dir path (--data-dir PATH, else env JOBSEARCH_DATA_DIR) is matched as w
 publish_gate.allow in the config lists per-file exceptions {path, value}: a hit is skipped only when it sits in
 the content of that exact file AND the matched text is inside value (case-insensitive). Hits in other files,
 commit metadata, ref names and file names are never skipped.
+The tree scan covers tracked files and untracked files that git does not ignore
+(git ls-files --cached --others --exclude-standard), so a tool folder that is never committed is read too.
+To keep such a folder out, list it in .gitignore or in the repo's .git/info/exclude; a file force-added
+later (git add -f) is scanned again.
 
 Exit codes: 0 PASS (zero hits) | 1 hits | 2 SKIPPED (no config, identity empty or yields no pattern; never a pass)
             | 3 error: unreadable config, bad repo, or git failure.

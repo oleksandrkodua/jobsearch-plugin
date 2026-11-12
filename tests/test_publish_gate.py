@@ -98,6 +98,46 @@ class TreeTest(GateCase):
         self.assertEqual(r.returncode, 1)
         self.assertIn("untracked.txt:2", r.stdout)
 
+    def exclude(self, line):
+        p = os.path.join(self.repo, ".git", "info", "exclude")
+        os.makedirs(os.path.dirname(p), exist_ok=True)
+        with open(p, "a", encoding="utf-8") as f:
+            f.write(line + "\n")
+
+    def test_untracked_file_in_git_info_exclude_is_not_scanned(self):
+        self.put("a.txt", "ok\n")
+        self.commit()
+        self.put("tool/notes.txt", f"{NAME}\n")
+        self.exclude("tool/")
+        r = self.gate()
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertIn("PUBLISH GATE: PASS", r.stdout)
+
+    def test_gitignored_untracked_file_is_not_scanned(self):
+        self.put(".gitignore", "tool/\n")
+        self.put("a.txt", "ok\n")
+        self.commit()
+        self.put("tool/notes.txt", f"{NAME}\n")
+        r = self.gate()
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+
+    def test_force_added_excluded_file_is_scanned_again(self):
+        self.put("a.txt", "ok\n")
+        self.commit()
+        self.put("tool/notes.txt", f"{NAME}\n")
+        self.exclude("tool/")
+        git(self.repo, "add", "-f", "tool/notes.txt")
+        r = self.gate()
+        self.assertEqual(r.returncode, 1)
+        self.assertIn("tool/notes.txt:1", r.stdout)
+
+    def test_docstring_and_readme_describe_the_untracked_scan(self):
+        for path in (GATE, os.path.join(ROOT, "README.md")):
+            with open(path, encoding="utf-8") as f:
+                text = f.read()
+            self.assertIn("untracked", text, path)
+            self.assertIn(".git/info/exclude", text, path)
+
     def test_phone_variants_fail(self):
         variants = ["+1 555 0100", "1-555-0100", "15550100", "555.0100", "(555) 0100", "555 0100", "+15550100"]
         for i, v in enumerate(variants):
