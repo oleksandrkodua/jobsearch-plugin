@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.0.4
 - `/jobsearch:rank`: soft flags and an optional "Questions for the recruiter" block. Step 5 lists four soft flags read from the vacancy text (a working day described as not normalised or without fixed hours; 5 or more interview stages for a regular position; a large unpaid test task on a real project; urgency pressure such as "decide today"): quote the phrase, flag and ask, never auto-reject, never change the match %; information the vacancy does not give is Unknown, not a flag. The output block gets a `soft flags (quoted)` entry on the `Blockers` line and an optional `Questions for the recruiter` line (2-4 questions, each tied to a quoted phrase or an Unknown item, never an invented phrase, never changing the Decision).
 - Write guard: a read-only `rsync` (`-n`, `--dry-run`, a short flag cluster that contains `n` such as `-rcn`, or `--list-only`) is no longer treated as a write to a protected path. A dry run that also asks for `--write-batch`, `--only-write-batch` or `--log-file`, a redirect into a protected file, and a second real `rsync` in the same command line are still denied.
 - Tests: `tests/test_readme_version.py` checks that the README "Current version" line and any tag it names match `plugin.json`, and that `CHANGELOG.md` has a section for that version.
