@@ -26,6 +26,7 @@ For EACH vacancy, in order:
    - Salary or schedule not published: Unknown, never a blocker.
    - A gross or contractor salary is never converted to compare with a net threshold; ask the user.
    - A requirement the config does not cover (for example a language level): not a blocker, ask.
+   - Soft flags (observations from the vacancy text; flag and ask, never auto-reject, never change the match %): (a) wording that says the working day is not normalised or has no fixed hours; (b) 5 or more interview stages for a regular position; (c) a large unpaid test task on a real project (a coding challenge is a blocker only if the config lists it); (d) urgency pressure such as "decide today". Quote the phrase. Information the vacancy does not give is Unknown, not a flag.
    - Empty `blockers` list: say "no blockers configured" and continue.
 6. **Requirement matrix.** For each must-have and nice-to-have: `YES` (traceable to the master CV or facts file; give the label), `PARTIAL` (say what is missing), `NO`, `UNCONFIRMED` (tool or skill not in the master: the user confirms or it counts as NO). Anything `honesty.*` or the facts file rules out counts as NO. Domain preference is not domain experience.
 7. **Match %** (state the arithmetic) with the weights from `match_weights` (must-have coverage with YES=1 and PARTIAL=0.5; nice-to-have; seniority fit; domain priority following the order of `targets.domains_priority`; format and salary). Verdict bands come from `thresholds`: at or above `apply` usually apply, at or below `decline` usually decline, between them judgement. These are working thresholds, not laws. Blockers win over the number.
@@ -41,9 +42,10 @@ Legitimacy: open? | age | possible repost (ids, dates) | ghost signals (observat
 Match: XX%  (arithmetic)
 Application status: NOT APPLIED | ALREADY APPLIED | POSSIBLY DUPLICATE | UNKNOWN
 Previous application: id, status, date
-Blockers: none | no blockers configured | list (hard / soft)
+Blockers: none | no blockers configured | list (hard / soft) | soft flags (quoted)
 Matrix: requirement -> YES/PARTIAL/NO/UNCONFIRMED (label)
 Decision: APPLY | NOT APPLY | ASK THE USER - reason
+Questions for the recruiter (optional, 2-4 max): each pairs a quoted phrase or a gap in the vacancy text with one neutral question. Only for phrases actually present, or for items that are Unknown (salary range, working hours and overlap with the user's time zone, number of interview stages, test-task size). Never invent a phrase. A question is not a verdict and never changes the Decision by itself.
 ```
 
 Batch mode: at most 10 vacancies per run, so each one gets a full check within one context. With more, rank the first 10 in the order given, list the rest, and offer them as the next batch. After the blocks, one table sorted by decision then match, and a count line (New / Possible duplicates / Already applied).

@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+- `/jobsearch:rank`: soft flags and an optional "Questions for the recruiter" block. Step 5 lists four soft flags read from the vacancy text (a working day described as not normalised or without fixed hours; 5 or more interview stages for a regular position; a large unpaid test task on a real project; urgency pressure such as "decide today"): quote the phrase, flag and ask, never auto-reject, never change the match %; information the vacancy does not give is Unknown, not a flag. The output block gets a `soft flags (quoted)` entry on the `Blockers` line and an optional `Questions for the recruiter` line (2-4 questions, each tied to a quoted phrase or an Unknown item, never an invented phrase, never changing the Decision).
+
 ## 1.0.3
 - `/jobsearch:funnel`: new "Reply speed tags" table. The optional note tags `reply:fast` (counted on REJECTED rows) and `reply:silence` (counted on NO_RESPONSE rows) are tallied separately; a group with fewer than 5 rows is marked "too few to conclude", and a tag on another status is ignored and reported. A `reply:*` token in a CHANGELOG note is no longer read as a reply word, so it cannot make a NO_RESPONSE row count as replied. The report stays read-only.
 
