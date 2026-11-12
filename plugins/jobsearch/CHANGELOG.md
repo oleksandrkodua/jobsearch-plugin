@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.0.3
 - `/jobsearch:funnel`: new "Reply speed tags" table. The optional note tags `reply:fast` (counted on REJECTED rows) and `reply:silence` (counted on NO_RESPONSE rows) are tallied separately; a group with fewer than 5 rows is marked "too few to conclude", and a tag on another status is ignored and reported. A `reply:*` token in a CHANGELOG note is no longer read as a reply word, so it cannot make a NO_RESPONSE row count as replied. The report stays read-only.
 
 ## 1.0.2
